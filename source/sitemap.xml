@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
+<!-- Free Sitemap Generator http://www.sitemapx.com -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<url>
+<loc>https://zcheng.site</loc>
+<priority>1</priority>
+<lastmod>2018-07-12T07:32:28+00:00</lastmod>
+<changefreq>Always</changefreq>
+<xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zcheng.site"/>
+</url>
+<url>
+<loc>https://zcheng.site/Sanhe.html</loc>
+<priority>0.8</priority>
+<lastmod>2018-07-12T07:32:28+00:00</lastmod>
+<changefreq>Always</changefreq>
+<xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zcheng.site/Sanhe.html"/>
+</url>
+<url>
+<loc>https://zcheng.site/sshkeys.html</loc>
+<priority>0.8</priority>
+<lastmod>2018-07-12T07:32:28+00:00</lastmod>
+<changefreq>Always</changefreq>
+<xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zcheng.site/sshkeys.html"/>
+</url>
+<url>
+<loc>https://zcheng.site/linux.html</loc>
+<priority>0.8</priority>
+<lastmod>2018-07-12T07:32:28+00:00</lastmod>
+<changefreq>Always</changefreq>
+<xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zcheng.site/linux.html"/>
+</url>
+<url>
+<loc>https://zcheng.site/second.html</loc>
+<priority>0.8</priority>
+<lastmod>2018-07-12T07:32:28+00:00</lastmod>
+<changefreq>Always</changefreq>
+<xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zcheng.site/second.html"/>
+</url>
+<url>
+<loc>https://zcheng.site/orange.html</loc>
+<priority>0.8</priority>
+<lastmod>2018-07-12T07:32:28+00:00</lastmod>
+<changefreq>Always</changefreq>
+<xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zcheng.site/orange.html"/>
+</url>
+</urlset>
