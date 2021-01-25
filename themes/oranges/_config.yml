@@ -118,11 +118,15 @@ friends:
   -
     nickname: 码+在线工具
     site: http://tool.codeplus.vip/
-    meta:
-  # -
-  #   nickname: Mhyu
-  #   site: https://mhyu.top/
-  #   meta:
+    meta: 
+  -
+    nickname: .NET 工匠辅助库
+    site: https://github.com/CacoCode/LBON
+    meta: Lu Ban Of .Net - .NET 工匠辅助库。Net 高可用、高效率的扩展库，希望对 .NET 开发者及爱好者带来便捷，告别996，远离ICU！！！
+  -
+    nickname: Blazor 网关架构
+    site: https://github.com/CacoCode/CodePlus.ApiGateway.Blazor
+    meta: 基于Ant Design Blazor 实现的服务器网关管理、监控框架
 
 # 页脚信息
 footer:
