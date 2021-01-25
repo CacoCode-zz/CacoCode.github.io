@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zcheng.site/"/>
-  <updated>2021-01-25T02:46:30.136Z</updated>
+  <updated>2021-01-25T02:53:03.566Z</updated>
   <id>https://zcheng.site/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://zcheng.site/pixel-drawing-board.html"/>
     <id>https://zcheng.site/pixel-drawing-board.html</id>
     <published>2020-09-27T10:42:38.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -51,7 +51,7 @@
     <link href="https://zcheng.site/pixel-icon-design.html"/>
     <id>https://zcheng.site/pixel-icon-design.html</id>
     <published>2020-06-03T21:26:51.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -78,7 +78,7 @@
     <link href="https://zcheng.site/css-animation-design.html"/>
     <id>https://zcheng.site/css-animation-design.html</id>
     <published>2020-05-26T20:44:52.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -108,7 +108,7 @@
     <link href="https://zcheng.site/change-syntax-of-css-to-scss.html"/>
     <id>https://zcheng.site/change-syntax-of-css-to-scss.html</id>
     <published>2020-05-16T09:44:48.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -135,7 +135,7 @@
     <link href="https://zcheng.site/something-about-html.html"/>
     <id>https://zcheng.site/something-about-html.html</id>
     <published>2020-05-15T08:48:04.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -161,11 +161,42 @@
   </entry>
   
   <entry>
+    <title>详解.NET Core 依赖注入生命周期</title>
+    <link href="https://zcheng.site/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html"/>
+    <id>https://zcheng.site/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html</id>
+    <published>2020-05-04T21:24:41.000Z</published>
+    <updated>2021-01-25T02:53:03.566Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;.NET Core 自带依赖注入框架，支持三种不同生命周期的注入模式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Singleton
+        
+      
+    
+    </summary>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/categories/NET-CORE/"/>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/tags/NET-CORE/"/>
+    
+      <category term="依赖注入" scheme="https://zcheng.site/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Something about CSS（持续更新⏳）</title>
     <link href="https://zcheng.site/something-about-css.html"/>
     <id>https://zcheng.site/something-about-css.html</id>
     <published>2020-05-01T12:03:39.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -192,7 +223,7 @@
     <link href="https://zcheng.site/minimalist-theme-oranges.html"/>
     <id>https://zcheng.site/minimalist-theme-oranges.html</id>
     <published>2020-04-18T11:08:18.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -221,7 +252,7 @@
     <link href="https://zcheng.site/home-life-during-COVID-19.html"/>
     <id>https://zcheng.site/home-life-during-COVID-19.html</id>
     <published>2020-03-25T14:48:35.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -248,7 +279,7 @@
     <link href="https://zcheng.site/2019-summary.html"/>
     <id>https://zcheng.site/2019-summary.html</id>
     <published>2020-01-01T20:03:32.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -276,7 +307,7 @@
     <link href="https://zcheng.site/machine-learning.html"/>
     <id>https://zcheng.site/machine-learning.html</id>
     <published>2019-10-25T18:01:28.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -301,7 +332,7 @@
     <link href="https://zcheng.site/vue-transition.html"/>
     <id>https://zcheng.site/vue-transition.html</id>
     <published>2019-07-13T12:37:58.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -332,7 +363,7 @@
     <link href="https://zcheng.site/2018-summary.html"/>
     <id>https://zcheng.site/2018-summary.html</id>
     <published>2019-02-03T14:19:04.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -360,7 +391,7 @@
     <link href="https://zcheng.site/phototobase64.html"/>
     <id>https://zcheng.site/phototobase64.html</id>
     <published>2018-12-12T17:19:52.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -388,7 +419,7 @@
     <link href="https://zcheng.site/sshkeys.html"/>
     <id>https://zcheng.site/sshkeys.html</id>
     <published>2018-08-09T12:23:41.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -417,7 +448,7 @@
     <link href="https://zcheng.site/Sanhe.html"/>
     <id>https://zcheng.site/Sanhe.html</id>
     <published>2018-07-06T15:38:22.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -446,7 +477,7 @@
     <link href="https://zcheng.site/linux.html"/>
     <id>https://zcheng.site/linux.html</id>
     <published>2018-06-21T10:03:20.000Z</published>
-    <updated>2021-01-25T02:46:30.136Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -476,7 +507,7 @@
     <link href="https://zcheng.site/hexo-deploy.html"/>
     <id>https://zcheng.site/hexo-deploy.html</id>
     <published>2018-05-01T11:44:37.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -505,7 +536,7 @@
     <link href="https://zcheng.site/hexo-build.html"/>
     <id>https://zcheng.site/hexo-build.html</id>
     <published>2018-04-10T12:46:50.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     
@@ -537,7 +568,7 @@
     <link href="https://zcheng.site/hello-world.html"/>
     <id>https://zcheng.site/hello-world.html</id>
     <published>2018-03-28T12:04:50.000Z</published>
-    <updated>2021-01-25T02:46:30.132Z</updated>
+    <updated>2021-01-25T02:53:03.566Z</updated>
     
     <summary type="html">
     

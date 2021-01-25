@@ -133,6 +133,33 @@
     
     
     <entry>
+      <title>详解.NET Core 依赖注入生命周期</title>
+      <link href="%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html"/>
+      <url>%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>.NET Core 自带依赖注入框架，支持三种不同生命周期的注入模式：</p><ul><li>Singleton 单例模式</li><li>Scoped 区域模式<ul><li>Transient  瞬时模式</li></ul></li></ul><p>但是常常不知道什么时候使用哪种模式才最合适，接下来我就用代码详细解读一下三种模式</p><h1 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h1><p>首先新建.NET Core  API项目来进行代码测试</p><p><img src="https://img-blog.csdnimg.cn/20200504210113672.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p><p>分别新建 Scoped、Singleton、Transient 三种模式的服务与接口，里面写一个GetIndex() 方法获取index ，用来区别服务的生命周期。<br><img src="https://img-blog.csdnimg.cn/20200504210410494.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>三个服务代码都是如此，然后添加依赖注入<br><img src="https://img-blog.csdnimg.cn/20200504210528854.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>最后在控制器中天加测试方法<br><img src="https://img-blog.csdnimg.cn/20200504211403956.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p><p>使用 [FromService] 特性注入服务，每次服务注入两次，用来区别服务的变化，输出服务的index，启动项目查看结果<br><img src="https://img-blog.csdnimg.cn/20200504211455243.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p><p>上图可以看到单例和区域模式下，两次注入的服务index是叠加的，可以说明两次服务注入的都是同一个。而瞬时模式两次注入的服务index都是初始值，也就说明两次服务都是新的。然后我们不停止项目在执行一次方法<br><img src="https://img-blog.csdnimg.cn/20200504211849227.png#pic_center" alt="在这里插入图片描述"><br>可以看到单列模式和区域模式有了不同，单例模式注入的服务，index值一直在叠加，而区域模式有重新从0开始叠加。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>结合以上示例可以清楚的分别三种模式的差别</p><ul><li><p>Singleton<br>单例模式，服务在第一次请求时被创建，其后的每次请求都沿用这个已创建的服务。</p></li><li><p>Scoped<br>作用域模式，服务在每次请求时被创建，整个请求过程中都贯穿使用这个创建的服务。</p></li></ul><ul><li>Transient 　　　<br>瞬态模式，服务在每次请求时被创建</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> .NET CORE </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> .NET CORE </tag>
+            
+            <tag> 依赖注入 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Something about CSS（持续更新⏳）</title>
       <link href="something-about-css.html"/>
       <url>something-about-css.html</url>
