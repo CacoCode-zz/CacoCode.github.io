@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="author" content="zchengsite, 1451426471@qq.com" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  
+  <title>详解.NET Core 依赖注入生命周期 | CodePlus</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+  <!-- jquery3.3.1 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- fancybox -->
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <script async src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js"></script>
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-126364107-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-126364107-1');
+    </script>
+  
+
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="CodePlus" type="application/atom+xml">
+</head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img no-lazy src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">CodePlus</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">主页</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">归档</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">标签</a>
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          <a href="/friends/">朋友</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">关于</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">详解.NET Core 依赖注入生命周期</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime" title="更新时间"></i>
+          2020-07-06
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags" title="标签"></i>
+                
+                <span class="span--tag">
+                  <a href="/tags/NET-CORE/" title=".NET CORE">
+                    <b>#</b> .NET CORE
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" title="微服务">
+                    <b>#</b> 微服务
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/Ocelot/" title="Ocelot">
+                    <b>#</b> Ocelot
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/Consul/" title="Consul">
+                    <b>#</b> Consul
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h2 id="总体介绍"><a href="#总体介绍" class="headerlink" title="总体介绍"></a>总体介绍</h2><p>随着业务需求的快速发展变化，需求不断增长，迫切需要一种更加快速高效的软件交付方式。微服务可以弥补单体应用不足，是一种更加快速高效软件架构风格。单体应用被分解成多个更小的服务，每个服务有自己的独立模块，单独部署，然后共同组成一个应用程序。把范围限定到单个独立业务模块功能。分布式部署在各台服务器上。本篇我们将介绍如何使用.NET Core打造自己的微服务架构。</p>
+<p>注意：<strong>微服务架构不是万能药，本篇仅供参考和探讨。对于大部分小项目来说，请不要为了微服务而微服务。毕竟技术不是万能的，技术是为业务服务的。</strong></p>
+<h3 id="微服务架构的好处"><a href="#微服务架构的好处" class="headerlink" title="微服务架构的好处"></a>微服务架构的好处</h3><ul>
+<li><p>单个服务很容易开发、理解和维护。</p>
+</li>
+<li><p>每个服务都可以有专门开发团队来开发。</p>
+</li>
+<li><p>每个微服务独立的部署。</p>
+</li>
+<li><p>每个服务独立扩展。</p>
+</li>
+</ul>
+<h3 id="微服务架构的不足（这个时候就需要用到服务发现）"><a href="#微服务架构的不足（这个时候就需要用到服务发现）" class="headerlink" title="微服务架构的不足（这个时候就需要用到服务发现）"></a>微服务架构的不足（这个时候就需要用到服务发现）</h3><ul>
+<li><p>微服务应用是分布式系统，由此会带来固有的复杂性。</p>
+</li>
+<li><p>服务地址目录，服务健康度，部署困难，服务依赖问题，数据库分区问题。</p>
+</li>
+</ul>
+<h3 id="传统模式"><a href="#传统模式" class="headerlink" title="传统模式"></a>传统模式</h3><p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706151724702.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt=""></p>
+<h3 id="Ocelot（网关）模式"><a href="#Ocelot（网关）模式" class="headerlink" title="Ocelot（网关）模式"></a>Ocelot（网关）模式</h3><p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706151747754.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt=""></p>
+<h3 id="集成IdentityService（认证）"><a href="#集成IdentityService（认证）" class="headerlink" title="集成IdentityService（认证）"></a>集成IdentityService（认证）</h3><p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706151805160.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="集成consul（服务发现）"><a href="#集成consul（服务发现）" class="headerlink" title="集成consul（服务发现）"></a>集成consul（服务发现）</h3><p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/202007061518202.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="搭建一个简单的微服务架构"><a href="#搭建一个简单的微服务架构" class="headerlink" title="搭建一个简单的微服务架构"></a>搭建一个简单的微服务架构</h2><h3 id="Ocelot"><a href="#Ocelot" class="headerlink" title="Ocelot"></a>Ocelot</h3><p>Ocelot 是一个仅适用于 .Net Core 的网关组件。Ocelot<br>中间件使用非常简单，难的点在于如何去配置。它的功能包括了：路由、请求聚合、服务发现、认证、鉴权、限流熔断、并内置了负载均衡器等的集成，而这些功能都是通过配置实现。</p>
+<p>Ocelot的开源地址：<a target="_blank" rel="noopener" href="https://github.com/ThreeMammals/Ocelot">https://github.com/ThreeMammals/Ocelot</a></p>
+<p>Ocelot官网地址：<a target="_blank" rel="noopener" href="https://ocelot.readthedocs.io/en/latest/index.html">https://ocelot.readthedocs.io/en/latest/index.html</a></p>
+<h4 id="基本集成"><a href="#基本集成" class="headerlink" title="基本集成"></a>基本集成</h4><p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706151907500.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="添加Ocelot"><a href="#添加Ocelot" class="headerlink" title="添加Ocelot"></a>添加Ocelot</h4><p>新建一个 .Net core 2.2 web 项目（ApiGateway），添加以下Nuget包：</p>
+<ul>
+<li><p><strong>Ocelot</strong></p>
+</li>
+<li><p><strong>Ocelot.Administration</strong> Ocelot支持在运行时通过经过身份验证的HTTP<br>API更改配置。这可以通过两种方式进行身份验证：使用Ocelot的内部IdentityServer（仅用于验证对管理API的请求）或将管理API身份验证挂钩到您自己的IdentityServer中。</p>
+</li>
+<li><p><strong>Ocelot.Cache.CacheManager</strong> CacheManager.Net扩展包</p>
+</li>
+<li><p><strong>Ocelot.Provider.Polly</strong> Polly.NET扩展包</p>
+</li>
+</ul>
+<p>在项目根目录添加ocelot.json，名字可以自取。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706151924142.png" alt="在这里插入图片描述"></p>
+<p>前面说了，所有功能都是通过配置实现的，所以配置也相对复杂。配置有两个部分。一组ReRoutes和一个GlobalConfiguration。ReRoutes是告诉Ocelot如何处理上游请求的对象。GlobalConfiguration顾名思义是全局配置，具体配置请查看官网。下面列举简单配置</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;GlobalConfiguration&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">//外部访问路径</span></span><br><span class="line">    <span class="string">&quot;BaseUrl&quot;</span>: <span class="string">&quot;http://localhost:13000&quot;</span>,</span><br><span class="line">    <span class="comment">//限速配置</span></span><br><span class="line">    <span class="string">&quot;RateLimitOptions&quot;</span>: &#123;</span><br><span class="line">      <span class="comment">//白名单</span></span><br><span class="line">      <span class="string">&quot;ClientWhitelist&quot;</span>: [],</span><br><span class="line">      <span class="string">&quot;EnableRateLimiting&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="comment">//限制时间段，例如1s，5m，1h，1d</span></span><br><span class="line">      <span class="string">&quot;Period&quot;</span>: <span class="string">&quot;1s&quot;</span>,</span><br><span class="line">      <span class="comment">//重试等待的时间间隔（秒）</span></span><br><span class="line">      <span class="string">&quot;PeriodTimespan&quot;</span>: <span class="number">1</span>,</span><br><span class="line">      <span class="comment">//限制</span></span><br><span class="line">      <span class="string">&quot;Limit&quot;</span>: <span class="number">1</span>,</span><br><span class="line">      <span class="comment">//自定义消息</span></span><br><span class="line">      <span class="string">&quot;QuotaExceededMessage&quot;</span>: <span class="string">&quot;单位时间内请求次数超过限制！&quot;</span>,</span><br><span class="line">      <span class="string">&quot;HttpStatusCode&quot;</span>: <span class="number">999</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">//熔断配置</span></span><br><span class="line">    <span class="string">&quot;QoSOptions&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;ExceptionsAllowedBeforeBreaking&quot;</span>: <span class="number">3</span>,</span><br><span class="line">      <span class="string">&quot;DurationOfBreak&quot;</span>: <span class="number">5</span>,</span><br><span class="line">      <span class="comment">//超时值(毫秒)</span></span><br><span class="line">      <span class="string">&quot;TimeoutValue&quot;</span>: <span class="number">5000</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">&quot;ReRoutes&quot;</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置文件初始化好之后，需要在<em>Program.cs</em><br>文件中加载JSON配置，Ocelot支持根据环境变量使用配置文件。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CreateWebHostBuilder(args).Build().Run();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IWebHostBuilder <span class="title">CreateWebHostBuilder</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span> =&gt; <span class="keyword">new</span> WebHostBuilder()</span><br><span class="line">        .UseKestrel((context, opt) =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            opt.AddServerHeader = <span class="literal">false</span>;</span><br><span class="line">            <span class="comment"><span class="doctag">///</span>/从配置文件读取配置</span></span><br><span class="line">            <span class="comment">//opt.Configure(context.Configuration.GetSection(&quot;Kestrel&quot;));</span></span><br><span class="line">        &#125;)</span><br><span class="line">        .UseContentRoot(Directory.GetCurrentDirectory())</span><br><span class="line">        .ConfigureAppConfiguration((hostingContext, config) =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">var</span> env = hostingContext.HostingEnvironment;</span><br><span class="line">            <span class="comment">//根据环境变量加载不同的JSON配置</span></span><br><span class="line">            config.AddJsonFile(<span class="string">&quot;appsettings.json&quot;</span>, optional: <span class="literal">true</span>, reloadOnChange: <span class="literal">true</span>)</span><br><span class="line">              .AddJsonFile(<span class="string">$&quot;appsettings.<span class="subst">&#123;env.EnvironmentName&#125;</span>.json&quot;</span>, optional: <span class="literal">true</span>, reloadOnChange: <span class="literal">true</span>)</span><br><span class="line">              .AddJsonFile(<span class="string">&quot;ocelot.json&quot;</span>)</span><br><span class="line">              .AddEnvironmentVariables(); <span class="comment">//从环境变量添加配置</span></span><br><span class="line">        &#125;)</span><br><span class="line">        .UseIISIntegration()</span><br><span class="line">        .ConfigureLogging((hostingContext, logging) =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            logging.AddConfiguration(hostingContext.Configuration.GetSection(<span class="string">&quot;Logging&quot;</span>));</span><br><span class="line">            <span class="comment">//添加控制台日志,Docker环境下请务必启用</span></span><br><span class="line">            logging.AddConsole();</span><br><span class="line">            <span class="comment">//添加调试日志</span></span><br><span class="line">            logging.AddDebug();</span><br><span class="line">        &#125;)</span><br><span class="line">        .UseStartup&lt;Startup&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在<em>Startup.cs</em><br>文件<em>ConfigureServices<em>方法中注册服务时使用</em>AddOcelot()<em>，</em>Configure</em><br>方法中使用<em>app.UseOcelot().Wait();</em> 这样网关的配置就完成了。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">services.AddOcelot(Configuration)</span><br><span class="line"></span><br><span class="line">app.UseOcelot().Wait();</span><br></pre></td></tr></table></figure>
+<h4 id="添加测试API项目"><a href="#添加测试API项目" class="headerlink" title="添加测试API项目"></a>添加测试API项目</h4><p>新建两个 .Net core 2.2 web项目（vs 自建的那种就OK），并使用Swagger来做接口说明。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706151952943.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152005274.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>Nuget 添加 <strong>Swashbuckle.AspNetCore 和<br>Microsoft.Extensions.PlatformAbstractions</strong> 实现Swagger ui，代码如下</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);</span><br><span class="line">    services.AddSwaggerGen(options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        options.SwaggerDoc(<span class="string">&quot;SwaggerAPI1&quot;</span>, <span class="keyword">new</span> Info &#123; Title = <span class="string">&quot;API1&quot;</span>, Version = <span class="string">&quot;v1&quot;</span> &#125;);</span><br><span class="line">        <span class="keyword">var</span> basePath = PlatformServices.Default.Application.ApplicationBasePath;</span><br><span class="line">        <span class="keyword">var</span> xmlPath = Path.Combine(basePath, <span class="string">&quot;Services.Test1.xml&quot;</span>);</span><br><span class="line">        options.IncludeXmlComments(xmlPath);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//服务注册</span></span><br><span class="line">    <span class="comment">//services.Configure&lt;ServiceRegistrationOptions&gt;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IHostingEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">    &#123;</span><br><span class="line">        app.UseDeveloperExceptionPage();</span><br><span class="line">    &#125;</span><br><span class="line">    app.UseSwagger(c =&gt; &#123; c.RouteTemplate = <span class="string">&quot;&#123;documentName&#125;/swagger.json&quot;</span>; &#125;);</span><br><span class="line">    app.UseSwaggerUI(c =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        c.SwaggerEndpoint(<span class="string">&quot;/SwaggerAPI1/swagger.json&quot;</span>, <span class="string">&quot;API1&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    app.UseMvc();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>项目.csproj文件中设置XML文档输出路径<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152022956.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><strong>Services.Test1 和 Services.Test2</strong><br>一样的配置，略过。编译启动，页面如下，接口配置完成。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/2020070615203973.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="配置项目的上游请求对象（ocelot-json）"><a href="#配置项目的上游请求对象（ocelot-json）" class="headerlink" title="配置项目的上游请求对象（ocelot.json）"></a>配置项目的上游请求对象（ocelot.json）</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;ReRoutes&quot;</span>: [</span><br><span class="line">  <span class="comment">//API1项目配置</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="string">&quot;UpstreamPathTemplate&quot;</span>: <span class="string">&quot;/gateway/1/&#123;url&#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;UpstreamHttpMethod&quot;</span>: [ <span class="string">&quot;Get&quot;</span>, <span class="string">&quot;Post&quot;</span>, <span class="string">&quot;Delete&quot;</span>, <span class="string">&quot;Put&quot;</span> ],</span><br><span class="line">    <span class="string">&quot;DownstreamPathTemplate&quot;</span>: <span class="string">&quot;/api1/&#123;url&#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;DownstreamScheme&quot;</span>: <span class="string">&quot;http&quot;</span>,</span><br><span class="line">    <span class="string">&quot;ServiceName&quot;</span>: <span class="string">&quot;API1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;UseServiceDiscovery&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="string">&quot;LoadBalancer&quot;</span>: <span class="string">&quot;RoundRobin&quot;</span>,</span><br><span class="line">    <span class="string">&quot;DownstreamHostAndPorts&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;119.29.50.115&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Port&quot;</span>: <span class="number">80</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Port&quot;</span>: <span class="number">13001</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;QoSOptions&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;ExceptionsAllowedBeforeBreaking&quot;</span>: <span class="number">3</span>,</span><br><span class="line">      <span class="string">&quot;DurationOfBreak&quot;</span>: <span class="number">10</span>,</span><br><span class="line">      <span class="string">&quot;TimeoutValue&quot;</span>: <span class="number">5000</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//&quot;AuthenticationOptions&quot;: &#123;</span></span><br><span class="line">    <span class="comment">//  &quot;AuthenticationProviderKey&quot;: &quot;Bearer&quot;,</span></span><br><span class="line">    <span class="comment">//  &quot;AllowedScopes&quot;: [</span></span><br><span class="line">    <span class="comment">//  ]</span></span><br><span class="line">    <span class="comment">//&#125;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">//API2项目配置</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="string">&quot;UpstreamPathTemplate&quot;</span>: <span class="string">&quot;/gateway/2/&#123;url&#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;UpstreamHttpMethod&quot;</span>: [ <span class="string">&quot;Get&quot;</span>, <span class="string">&quot;Post&quot;</span>, <span class="string">&quot;Delete&quot;</span>, <span class="string">&quot;Put&quot;</span> ],</span><br><span class="line">    <span class="string">&quot;DownstreamPathTemplate&quot;</span>: <span class="string">&quot;/api2/&#123;url&#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;DownstreamScheme&quot;</span>: <span class="string">&quot;http&quot;</span>,</span><br><span class="line">    <span class="string">&quot;ServiceName&quot;</span>: <span class="string">&quot;API2&quot;</span>,</span><br><span class="line">    <span class="string">&quot;UseServiceDiscovery&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="string">&quot;LoadBalancer&quot;</span>: <span class="string">&quot;RoundRobin&quot;</span>,</span><br><span class="line">    <span class="string">&quot;DownstreamHostAndPorts&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;111.230.160.62&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Port&quot;</span>: <span class="number">80</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Port&quot;</span>: <span class="number">13002</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">&quot;QoSOptions&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;ExceptionsAllowedBeforeBreaking&quot;</span>: <span class="number">3</span>,</span><br><span class="line">      <span class="string">&quot;DurationOfBreak&quot;</span>: <span class="number">10</span>,</span><br><span class="line">      <span class="string">&quot;TimeoutValue&quot;</span>: <span class="number">5000</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//&quot;AuthenticationOptions&quot;: &#123;</span></span><br><span class="line">    <span class="comment">//  &quot;AuthenticationProviderKey&quot;: &quot;Bearer&quot;,</span></span><br><span class="line">    <span class="comment">//  &quot;AllowedScopes&quot;: [</span></span><br><span class="line">    <span class="comment">//  ]</span></span><br><span class="line">    <span class="comment">//&#125;</span></span><br><span class="line">  &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>ReRoutes API对象模板配置节点解释如下：</p>
+<table>
+<thead>
+<tr>
+<th><em>UpstreamPathTemplate</em></th>
+<th>上游路径模板</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>UpstreamHttpMethod</em></td>
+<td>上游HTTP请求方法</td>
+</tr>
+<tr>
+<td><em>DownstreamPathTemplate</em></td>
+<td>下游路径模板</td>
+</tr>
+<tr>
+<td><em>DownstreamScheme</em></td>
+<td>下游协议Https/Http</td>
+</tr>
+<tr>
+<td><em>DownstreamHostAndPorts</em></td>
+<td>下游主机和端口号，允许配置多个</td>
+</tr>
+<tr>
+<td><em>UseServiceDiscovery</em></td>
+<td>是否使用服务发现（True/False）</td>
+</tr>
+<tr>
+<td><em>ServiceName</em></td>
+<td>服务名称（结合服务发现使用）</td>
+</tr>
+<tr>
+<td><em>LoadBalancer</em></td>
+<td>指定一个负载均衡算法： RoundRobin：轮询 LeastConnection：最少连接数 NoLoadBalancer：不适用负载均衡</td>
+</tr>
+<tr>
+<td><em>LoadBalancerOptions</em></td>
+<td>负载均衡器配置</td>
+</tr>
+<tr>
+<td><em>QoSOptions</em></td>
+<td>熔断配置，在请求向下游服务时使用断路</td>
+</tr>
+<tr>
+<td><em>AuthenticationOptions</em></td>
+<td>权限配置</td>
+</tr>
+</tbody></table>
+<h4 id="启动结果"><a href="#启动结果" class="headerlink" title="启动结果"></a>启动结果</h4><p>启动web<br>项目，web页面报错，但无妨，使用PostMan请求网关接口访问api1/TestOnes成功。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152106731.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="聚合API文档（SwaggerUI）"><a href="#聚合API文档（SwaggerUI）" class="headerlink" title="聚合API文档（SwaggerUI）"></a>聚合API文档（SwaggerUI）</h3><p>前面配置了网关接口上游，但是页面Swagger没有显示，这节主要是整合SwaggerUI。</p>
+<p>首先需要配置ApiGateway项目的Swagger，在配置文件配置上面两个接口的SwaggerNames，代码中遍历添加到网关项目的SwaggerUI中,代码如下</p>
+<h4 id="ConfigureServices"><a href="#ConfigureServices" class="headerlink" title="ConfigureServices"></a>ConfigureServices</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(options =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    options.SwaggerDoc(Configuration[<span class="string">&quot;Swagger:Name&quot;</span>], <span class="keyword">new</span> Info &#123; Title = Configuration[<span class="string">&quot;Swagger:Title&quot;</span>], Version = Configuration[<span class="string">&quot;Swagger:Version&quot;</span>] &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="Configure"><a href="#Configure" class="headerlink" title="Configure"></a>Configure</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IHostingEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> apis = Configuration[<span class="string">&quot;Apis:SwaggerNames&quot;</span>].Split(<span class="string">&quot;;&quot;</span>).ToList();</span><br><span class="line">    <span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">    &#123;</span><br><span class="line">        app.UseDeveloperExceptionPage();</span><br><span class="line">    &#125;</span><br><span class="line">    app.UseMvc()</span><br><span class="line">      .UseSwagger()</span><br><span class="line">      .UseSwaggerUI(options =&gt;</span><br><span class="line">      &#123;</span><br><span class="line">          apis.ToList().ForEach(key =&gt;</span><br><span class="line">          &#123;</span><br><span class="line">              options.SwaggerEndpoint(<span class="string">$&quot;/<span class="subst">&#123;key&#125;</span>/swagger.json&quot;</span>, key);</span><br><span class="line">          &#125;);</span><br><span class="line">          options.DocumentTitle = <span class="string">&quot;网关&quot;</span>;</span><br><span class="line">      &#125;);</span><br><span class="line">    app.UseOcelot().Wait();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="appsettings-json"><a href="#appsettings-json" class="headerlink" title="appsettings.json"></a>appsettings.json</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;Swagger&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;Name&quot;</span>: <span class="string">&quot;ApiGateway&quot;</span>,</span><br><span class="line">  <span class="string">&quot;Title&quot;</span>: <span class="string">&quot;网关服务&quot;</span>,</span><br><span class="line">  <span class="string">&quot;Version&quot;</span>: <span class="string">&quot;v1&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line"><span class="string">&quot;Apis&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;SwaggerNames&quot;</span>: <span class="string">&quot;SwaggerAPI1;SwaggerAPI2&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>PS:SwaggerAPI1、SwaggerAPI2是前面两个接口的SwaggerName，这里需要对应上。</em></p>
+<h4 id="配置Swagger的上游请求对象（ocelot-json）"><a href="#配置Swagger的上游请求对象（ocelot-json）" class="headerlink" title="配置Swagger的上游请求对象（ocelot.json）"></a>配置Swagger的上游请求对象（ocelot.json）</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//swagger API1配置</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;DownstreamPathTemplate&quot;</span>: <span class="string">&quot;/SwaggerAPI1/swagger.json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;DownstreamScheme&quot;</span>: <span class="string">&quot;http&quot;</span>,</span><br><span class="line">  <span class="string">&quot;UpstreamPathTemplate&quot;</span>: <span class="string">&quot;/SwaggerAPI1/swagger.json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;UpstreamHttpMethod&quot;</span>: [ <span class="string">&quot;GET&quot;</span>, <span class="string">&quot;POST&quot;</span>, <span class="string">&quot;DELETE&quot;</span>, <span class="string">&quot;PUT&quot;</span> ],</span><br><span class="line">  <span class="string">&quot;DownstreamHostAndPorts&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;119.29.50.115&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Port&quot;</span>: <span class="number">80</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Port&quot;</span>: <span class="number">13001</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;,</span><br><span class="line"><span class="comment">//swagger API2配置</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;DownstreamPathTemplate&quot;</span>: <span class="string">&quot;/SwaggerAPI2/swagger.json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;DownstreamScheme&quot;</span>: <span class="string">&quot;http&quot;</span>,</span><br><span class="line">  <span class="string">&quot;UpstreamPathTemplate&quot;</span>: <span class="string">&quot;/SwaggerAPI2/swagger.json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;UpstreamHttpMethod&quot;</span>: [ <span class="string">&quot;GET&quot;</span>, <span class="string">&quot;POST&quot;</span>, <span class="string">&quot;DELETE&quot;</span>, <span class="string">&quot;PUT&quot;</span> ],</span><br><span class="line">  <span class="string">&quot;DownstreamHostAndPorts&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;111.230.160.62&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Port&quot;</span>: <span class="number">80</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Port&quot;</span>: <span class="number">13002</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="启动结果-1"><a href="#启动结果-1" class="headerlink" title="启动结果"></a>启动结果</h4><p>使用SwaggerUI整合了API1和API2的接口文档。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152128570.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="IdentityServer-集成"><a href="#IdentityServer-集成" class="headerlink" title="IdentityServer 集成"></a>IdentityServer 集成</h3><p>官网文档地址：<a target="_blank" rel="noopener" href="http://docs.identityserver.io/en/latest/index.html">http://docs.identityserver.io/en/latest/index.html</a></p>
+<p>IdentityServer4是一个基于OpenID Connect和 OAuth 2.0的针对 ASP .NET Core 2.0的框架。</p>
+<p>IdentityServer是将规范兼容的OpenID Connect和OAuth 2.0终结点添加到任意ASP .NET<br>Core应用程序的中间件。你构建包含登录和注销页面的应用程序，IdentityServer中间件会向其添加必要的协议头，以便客户端应用程序可以使用这些标准协议与其对话。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152141753.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="添加授权服务项目"><a href="#添加授权服务项目" class="headerlink" title="添加授权服务项目"></a>添加授权服务项目</h4><p>新建 .Net core 2.2 web项目，添加以下Nuget包：</p>
+<ul>
+<li><p><strong>IdentityServer4.AspNetIdentity</strong></p>
+</li>
+<li><p><strong>IdentityServer4.EntityFramework</strong> 使用数据存储机制<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152152541.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h4 id="配置appsetting-json"><a href="#配置appsetting-json" class="headerlink" title="配置appsetting.json"></a>配置appsetting.json</h4><p>配置测试环境下的客服端信息和Identity API<br>资源配置，具体配置需要按照自己的逻辑定义，这里只是为了结合我下面的<strong>IdentityServerConfig</strong>文件所定义，代码如下，</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">为了结合我下面的IdentityServerConfig文件所定义，代码如下，</span><br><span class="line"><span class="string">&quot;IdentityServer&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;ApiName&quot;</span>: <span class="string">&quot;default-api&quot;</span>,</span><br><span class="line">    <span class="string">&quot;ApiSecret&quot;</span>: <span class="string">&quot;secret&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Clients&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">&quot;ClientId&quot;</span>: <span class="string">&quot;client&quot;</span>,</span><br><span class="line">        <span class="string">&quot;AllowedGrantTypes&quot;</span>: [</span><br><span class="line">          <span class="string">&quot;password&quot;</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;ClientSecrets&quot;</span>: [</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="string">&quot;Value&quot;</span>: <span class="string">&quot;def2edf7-5d42-4edc-a84a-30136c340e13&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;AllowedScopes&quot;</span>: [</span><br><span class="line">          <span class="string">&quot;default-api&quot;</span></span><br><span class="line">        ]</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">&quot;ClientId&quot;</span>: <span class="string">&quot;demo&quot;</span>,</span><br><span class="line">        <span class="string">&quot;ClientName&quot;</span>: <span class="string">&quot;MVC Client Demo&quot;</span>,</span><br><span class="line">        <span class="string">&quot;AllowedGrantTypes&quot;</span>: [</span><br><span class="line">          <span class="string">&quot;hybrid&quot;</span>,</span><br><span class="line">          <span class="string">&quot;client_credentials&quot;</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;RequireConsent&quot;</span>: <span class="string">&quot;true&quot;</span>,</span><br><span class="line">        <span class="string">&quot;ClientSecrets&quot;</span>: [</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="string">&quot;Value&quot;</span>: <span class="string">&quot;def2edf7-5d42-4edc-a84a-30136c340e13&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;RedirectUris&quot;</span>: [</span><br><span class="line">          <span class="string">&quot;http://openidclientdemo.com:8001/signin-oidc&quot;</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;PostLogoutRedirectUris&quot;</span>: [</span><br><span class="line">          <span class="string">&quot;http://openidclientdemo.com:8001/signout-callback-oidc&quot;</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;AllowedScopes&quot;</span>: [</span><br><span class="line">          <span class="string">&quot;openid&quot;</span>,</span><br><span class="line">          <span class="string">&quot;profile&quot;</span>,</span><br><span class="line">          <span class="string">&quot;default-api&quot;</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;AllowOfflineAccess&quot;</span>: <span class="string">&quot;true&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="添加IdentityServerConfig类"><a href="#添加IdentityServerConfig类" class="headerlink" title="添加IdentityServerConfig类"></a>添加IdentityServerConfig类</h4><p>IdentityServerConfig 类分为三个方法：</p>
+<h5 id="定义API资源："><a href="#定义API资源：" class="headerlink" title="定义API资源："></a>定义API资源：</h5><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IEnumerable&lt;ApiResource&gt; <span class="title">GetApiResources</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> List&lt;ApiResource&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">new</span> ApiResource(<span class="string">&quot;default-api&quot;</span>, <span class="string">&quot;Default (all) API&quot;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            Description = <span class="string">&quot;AllFunctionalityYouHaveInTheApplication&quot;</span>,</span><br><span class="line">            ApiSecrets= &#123;<span class="keyword">new</span> Secret(<span class="string">&quot;secret&quot;</span>) &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="定义身份资源："><a href="#定义身份资源：" class="headerlink" title="定义身份资源："></a>定义身份资源：</h5><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IEnumerable&lt;IdentityResource&gt; <span class="title">GetIdentityResources</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> List&lt;IdentityResource&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.OpenId(),</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.Profile(),</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.Email(),</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.Phone(),</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.Address()</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IEnumerable&lt;IdentityResource&gt; <span class="title">GetIdentityResources</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> customProfile = <span class="keyword">new</span> IdentityResource(</span><br><span class="line">        name: <span class="string">&quot;custom.profile&quot;</span>,</span><br><span class="line">        displayName: <span class="string">&quot;Custom profile&quot;</span>,</span><br><span class="line">        claimTypes: <span class="keyword">new</span>[] &#123; <span class="string">&quot;name&quot;</span>, <span class="string">&quot;email&quot;</span>, <span class="string">&quot;status&quot;</span> &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> List&lt;IdentityResource&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.OpenId(),</span><br><span class="line">        <span class="keyword">new</span> IdentityResources.Profile(),</span><br><span class="line">        customProfile</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>IdentityResource</em> 具体属性</p>
+<p><strong>Enabled</strong></p>
+<p>指示此资源是否已启用且可以请求。默认为true。</p>
+<p><strong>Name</strong></p>
+<p>标识资源的唯一名称。这是客户端将用于授权请求中的scope参数的值。</p>
+<p><strong>DisplayName</strong></p>
+<p>显示名称。</p>
+<p><strong>Description</strong></p>
+<p>描述。</p>
+<p><strong>Required</strong></p>
+<p>默认为false。（暂未深究理解）</p>
+<p><strong>Emphasize</strong></p>
+<p>默认为false。（暂未深究理解）</p>
+<p><strong>ShowInDiscoveryDocument</strong></p>
+<p>指定此范围是否显示在发现文档中。默认为true。</p>
+<p><strong>UserClaims</strong></p>
+<p>应包含在身份令牌中的关联用户声明类型的列表。</p>
+<h5 id="定义测试客服端"><a href="#定义测试客服端" class="headerlink" title="定义测试客服端"></a>定义测试客服端</h5><p>此处则是通过appsetting.json 文件获取配置</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IEnumerable&lt;Client&gt; <span class="title">GetClients</span>(<span class="params">IConfiguration configuration</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> clients = <span class="keyword">new</span> List&lt;Client&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> (<span class="keyword">var</span> child <span class="keyword">in</span> configuration.GetSection(<span class="string">&quot;IdentityServer:Clients&quot;</span>).GetChildren())</span><br><span class="line">    &#123;</span><br><span class="line">        clients.Add(<span class="keyword">new</span> Client</span><br><span class="line">        &#123;</span><br><span class="line">            ClientId = child[<span class="string">&quot;ClientId&quot;</span>],</span><br><span class="line">            ClientName = child[<span class="string">&quot;ClientName&quot;</span>],</span><br><span class="line">            AllowedGrantTypes = child.GetSection(<span class="string">&quot;AllowedGrantTypes&quot;</span>).GetChildren().Select(c =&gt; c.Value).ToArray(),</span><br><span class="line">            RequireConsent = <span class="built_in">bool</span>.Parse(child[<span class="string">&quot;RequireConsent&quot;</span>] ?? <span class="string">&quot;false&quot;</span>),</span><br><span class="line">            AllowOfflineAccess = <span class="built_in">bool</span>.Parse(child[<span class="string">&quot;AllowOfflineAccess&quot;</span>] ?? <span class="string">&quot;false&quot;</span>),</span><br><span class="line">            ClientSecrets = child.GetSection(<span class="string">&quot;ClientSecrets&quot;</span>).GetChildren().Select(secret =&gt; <span class="keyword">new</span> Secret(secret[<span class="string">&quot;Value&quot;</span>].Sha256())).ToArray(),</span><br><span class="line">            AllowedScopes = child.GetSection(<span class="string">&quot;AllowedScopes&quot;</span>).GetChildren().Select(c =&gt; c.Value).ToArray(),</span><br><span class="line">            RedirectUris = child.GetSection(<span class="string">&quot;RedirectUris&quot;</span>).GetChildren().Select(c =&gt; c.Value).ToArray(),</span><br><span class="line">            PostLogoutRedirectUris = child.GetSection(<span class="string">&quot;PostLogoutRedirectUris&quot;</span>).GetChildren().Select(c =&gt; c.Value).ToArray(),</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> clients;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="配置Startup"><a href="#配置Startup" class="headerlink" title="配置Startup"></a>配置Startup</h4><h5 id="ConfigureServices-1"><a href="#ConfigureServices-1" class="headerlink" title="ConfigureServices"></a>ConfigureServices</h5><p>这里只是用作测试，所以没有在数据库中读取配置，而是在内存中获取。相应的数据库读取方法也有说明。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//var connectionString = Configuration.GetConnectionString(&quot;Default&quot;);</span></span><br><span class="line">    <span class="comment">//services.AddDbContext&lt;MagicodesAdminContext&gt;(options =&gt; options.UseSqlServer(connectionString));</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//services.AddIdentity&lt;AbpUsers, AbpRoles&gt;()</span></span><br><span class="line">    <span class="comment">//    .AddEntityFrameworkStores&lt;MagicodesAdminContext&gt;()</span></span><br><span class="line">    <span class="comment">//    .AddDefaultTokenProviders();</span></span><br><span class="line"></span><br><span class="line">    services.AddIdentityServer()</span><br><span class="line">        .AddDeveloperSigningCredential()</span><br><span class="line">        .AddInMemoryPersistedGrants()</span><br><span class="line">        .AddInMemoryIdentityResources(IdentityServerConfig.GetIdentityResources())</span><br><span class="line">        .AddInMemoryApiResources(IdentityServerConfig.GetApiResources())</span><br><span class="line">        .AddInMemoryClients(IdentityServerConfig.GetClients(Configuration))</span><br><span class="line">        <span class="comment">//.AddAspNetIdentity&lt;AbpUsers&gt;()</span></span><br><span class="line">    <span class="comment">//从数据库读取配置等内容(clients, resources)</span></span><br><span class="line">    <span class="comment">//.AddConfigurationStore(options =&gt;</span></span><br><span class="line">    <span class="comment">//&#123;</span></span><br><span class="line">    <span class="comment">//    options.ConfigureDbContext = b =&gt;</span></span><br><span class="line">    <span class="comment">//        b.UseSqlServer(connectionString);</span></span><br><span class="line">    <span class="comment">//&#125;)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// this adds the operational data from DB (codes, tokens, consents)</span></span><br><span class="line">    <span class="comment">//.AddOperationalStore(options =&gt;</span></span><br><span class="line">    <span class="comment">//&#123;</span></span><br><span class="line">    <span class="comment">//    options.ConfigureDbContext = b =&gt;</span></span><br><span class="line">    <span class="comment">//        b.UseSqlServer(connectionString);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//    options.PersistedGrants.Name = &quot;AbpPersistedGrants&quot;;</span></span><br><span class="line">    <span class="comment">//    //options.DeviceFlowCodes.Name =</span></span><br><span class="line">    <span class="comment">//    // this enables automatic token cleanup. this is optional.</span></span><br><span class="line">    <span class="comment">//    options.EnableTokenCleanup = true;</span></span><br><span class="line">    <span class="comment">//&#125;);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//.AddAspNetIdentity()</span></span><br><span class="line">    <span class="comment">//.AddAbpPersistedGrants&lt;AdminDbContext&gt;()</span></span><br><span class="line">    <span class="comment">//.AddAbpIdentityServer&lt;User&gt;();</span></span><br><span class="line">    ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Configure-1"><a href="#Configure-1" class="headerlink" title="Configure"></a>Configure</h5><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IHostingEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">    &#123;</span><br><span class="line">        app.UseDeveloperExceptionPage();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    app.UseIdentityServer();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="启动结果-2"><a href="#启动结果-2" class="headerlink" title="启动结果"></a>启动结果</h4><p>就这样可以启动服务了，浏览器启动会显示如下页面，因为没有任何页面启动，所为显示为404。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152219466.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>但无妨，我们可以使用PostMan 访问：</p>
+<p><em><a target="_blank" rel="noopener" href="http://localhost:13004/.well-known/openid-configuration">http://localhost:13004/.well-known/openid-configuration</a></em><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152231143.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>你会看到官方所谓的发现文档。客户端和API将使用它来下载必要的配置数据。到此为止IdentityServer服务已经搭建成功！</p>
+<p>首次启动时，IdentityServer将为您创建一个开发人员签名密钥，它是一个名为的文件。您不必将该文件检入源代码管理中，如果该文件不存在，将重新创建该文件。tempkey.rsa</p>
+<h4 id="配置ApiGateway网关项目"><a href="#配置ApiGateway网关项目" class="headerlink" title="配置ApiGateway网关项目"></a>配置ApiGateway网关项目</h4><p>在前面Ocelot章节中，配置了ocelot.json，这里继续修改ocelot.json文件，启用权限认证</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;UpstreamPathTemplate&quot;</span>: <span class="string">&quot;/gateway/1/&#123;url&#125;&quot;</span>,</span><br><span class="line">  <span class="string">&quot;UpstreamHttpMethod&quot;</span>: [ <span class="string">&quot;Get&quot;</span>, <span class="string">&quot;Post&quot;</span>, <span class="string">&quot;Delete&quot;</span>, <span class="string">&quot;Put&quot;</span> ],</span><br><span class="line">  <span class="string">&quot;DownstreamPathTemplate&quot;</span>: <span class="string">&quot;/api1/&#123;url&#125;&quot;</span>,</span><br><span class="line">  <span class="string">&quot;DownstreamScheme&quot;</span>: <span class="string">&quot;http&quot;</span>,</span><br><span class="line">  <span class="string">&quot;ServiceName&quot;</span>: <span class="string">&quot;API1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;UseServiceDiscovery&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="string">&quot;LoadBalancer&quot;</span>: <span class="string">&quot;RoundRobin&quot;</span>,</span><br><span class="line">  <span class="string">&quot;DownstreamHostAndPorts&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;119.29.50.115&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Port&quot;</span>: <span class="number">80</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;Host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Port&quot;</span>: <span class="number">13001</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line"></span><br><span class="line">  <span class="string">&quot;QoSOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;ExceptionsAllowedBeforeBreaking&quot;</span>: <span class="number">3</span>,</span><br><span class="line">    <span class="string">&quot;DurationOfBreak&quot;</span>: <span class="number">10</span>,</span><br><span class="line">    <span class="string">&quot;TimeoutValue&quot;</span>: <span class="number">5000</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//启用权限认证</span></span><br><span class="line">  <span class="string">&quot;AuthenticationOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;AuthenticationProviderKey&quot;</span>: <span class="string">&quot;IdentityBearer&quot;</span>,</span><br><span class="line">    <span class="string">&quot;AllowedScopes&quot;</span>: [</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后还需要在ApiGateway项目中修改appsetting.json文件，添加IdentityService服务配置。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;IdentityService&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;Uri&quot;</span>: <span class="string">&quot;http://localhost:13004&quot;</span>,<span class="comment">//认证服务IP</span></span><br><span class="line">    <span class="string">&quot;DefaultScheme&quot;</span>: <span class="string">&quot;IdentityBearer&quot;</span>,</span><br><span class="line">    <span class="string">&quot;UseHttps&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">&quot;ApiName&quot;</span>: <span class="string">&quot;default-api&quot;</span>,</span><br><span class="line">    <span class="string">&quot;ApiSecret&quot;</span>: <span class="string">&quot;def2edf7-5d42-4edc-a84a-30136c340e13&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来就是配置 ApiGateway项目 Startup文件了。</p>
+<p>需要引入Nuget包：<strong>IdentityServer4.AccessTokenValidation</strong></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//Identity Server Bearer Tokens</span></span><br><span class="line"></span><br><span class="line">    Action&lt;IdentityServerAuthenticationOptions&gt; isaOpt = option =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        option.Authority = Configuration[<span class="string">&quot;IdentityService:Uri&quot;</span>];</span><br><span class="line">        option.RequireHttpsMetadata = Convert.ToBoolean(Configuration[<span class="string">&quot;IdentityService:UseHttps&quot;</span>]);</span><br><span class="line">        option.ApiName = Configuration[<span class="string">&quot;IdentityService:ApiName&quot;</span>];</span><br><span class="line">        option.ApiSecret = Configuration[<span class="string">&quot;IdentityService:ApiSecret&quot;</span>];</span><br><span class="line">        option.SupportedTokens = SupportedTokens.Both;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    services.AddAuthentication().AddIdentityServerAuthentication(Configuration[<span class="string">&quot;IdentityService:DefaultScheme&quot;</span>], isaOpt);</span><br><span class="line"></span><br><span class="line">    services</span><br><span class="line">        .AddOcelot(Configuration)</span><br><span class="line">        <span class="comment">//启用缓存</span></span><br><span class="line">        .AddCacheManager(x =&gt; &#123; x.WithDictionaryHandle(); &#125;)</span><br><span class="line">        .AddPolly()</span><br><span class="line">    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); ;</span><br><span class="line">    services.AddSwaggerGen(options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        options.SwaggerDoc(Configuration[<span class="string">&quot;Swagger:Name&quot;</span>], <span class="keyword">new</span> Info &#123; Title = Configuration[<span class="string">&quot;Swagger:Title&quot;</span>], Version = Configuration[<span class="string">&quot;Swagger:Version&quot;</span>] &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置完成后启用Service.Test1、Service.Test2、ApiGateway、IdentityService项目。使用SwaggerUI请求会提示<strong>401<br>Unauthorized</strong>，这个时候IdentityService就起到作用了。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152250850.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>使用PostMan去请求IdentityService获取token<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152307585.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>使用token访问接口，数据返回正常<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152318122.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="调用Ocelot管理API"><a href="#调用Ocelot管理API" class="headerlink" title="调用Ocelot管理API"></a>调用Ocelot管理API</h4><p>通过IdentityServer 身份验证来调用Ocelot 管理接口。</p>
+<p>首先需要做的是引入相关的NuGet包：<strong>Install-Package Ocelot.Administration</strong></p>
+<p>修改 ApiGateway项目 Startup文件</p>
+<p>添加代码<strong>.AddAdministration(“/administration”, isaOpt);</strong>路径名称可自取。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//Identity Server Bearer Tokens</span></span><br><span class="line"></span><br><span class="line">    Action&lt;IdentityServerAuthenticationOptions&gt; isaOpt = option =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        option.Authority = Configuration[<span class="string">&quot;IdentityService:Uri&quot;</span>];</span><br><span class="line">        option.RequireHttpsMetadata = Convert.ToBoolean(Configuration[<span class="string">&quot;IdentityService:UseHttps&quot;</span>]);</span><br><span class="line">        option.ApiName = Configuration[<span class="string">&quot;IdentityService:ApiName&quot;</span>];</span><br><span class="line">        option.ApiSecret = Configuration[<span class="string">&quot;IdentityService:ApiSecret&quot;</span>];</span><br><span class="line">        option.SupportedTokens = SupportedTokens.Both;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    services.AddAuthentication().AddIdentityServerAuthentication(Configuration[<span class="string">&quot;IdentityService:DefaultScheme&quot;</span>], isaOpt);</span><br><span class="line"></span><br><span class="line">    services</span><br><span class="line">        .AddOcelot(Configuration)</span><br><span class="line">        <span class="comment">//启用缓存</span></span><br><span class="line">        .AddCacheManager(x =&gt; &#123; x.WithDictionaryHandle(); &#125;)</span><br><span class="line">        .AddPolly()</span><br><span class="line">        .AddAdministration(<span class="string">&quot;/administration&quot;</span>, isaOpt);</span><br><span class="line">    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); ;</span><br><span class="line">    services.AddSwaggerGen(options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        options.SwaggerDoc(Configuration[<span class="string">&quot;Swagger:Name&quot;</span>], <span class="keyword">new</span> Info &#123; Title = Configuration[<span class="string">&quot;Swagger:Title&quot;</span>], Version = Configuration[<span class="string">&quot;Swagger:Version&quot;</span>] &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="API方法"><a href="#API方法" class="headerlink" title="API方法"></a>API方法</h4><p><strong>POST {adminPath} / connect / token</strong></p>
+<p>获取token</p>
+<p>请求的主体是表单数据，如下所示</p>
+<p><em>client_id</em> 设为管理员</p>
+<p>*client_secret *设置为设置管理服务时使用的任何内容。</p>
+<p><em>scope</em> 设为管理员</p>
+<p><em>grant_type</em> 设置为client_credentials</p>
+<p><strong>获取{adminPath} /configuration</strong></p>
+<p>获得当前的Ocelot配置。</p>
+<p><strong>POST {adminPath} / configuration</strong></p>
+<p>这会覆盖现有配置。</p>
+<p>请求的主体是JSON，它与我们用于在文件系统上设置Ocelot.json格式相同。</p>
+<p>如果要使用此API，则运行Ocelot的进程必须具有写入ocelot.json或ocelot.{environment}<br>.json所在磁盘的权限。这是因为Ocelot会在保存时覆盖它们。</p>
+<p><strong>删除{adminPath} / outputcache / {region}</strong></p>
+<p>清除所有缓存区域</p>
+<h3 id="Consul（服务发现）"><a href="#Consul（服务发现）" class="headerlink" title="Consul（服务发现）"></a>Consul（服务发现）</h3><p>官网地址：<a target="_blank" rel="noopener" href="https://www.consul.io/">https://www.consul.io/</a></p>
+<p>Consul包含多个组件,但是作为一个整体，提供服务发现和服务配置的工具。</p>
+<p>主要特性：</p>
+<ul>
+<li><p><strong>服务发现</strong><br>组件记录了分布式系统中所有服务的信息，其它服务可以据此找到这些服务。</p>
+</li>
+<li><p><strong>健康检查</strong> Consul 客户端可用提供任意数量的健康检查。</p>
+</li>
+<li><p><strong>Key/Value存储</strong> 应用程序可用根据自己的需要使用 Consul 的层级的 Key/Value<br>存储。</p>
+</li>
+<li><p><strong>多数据中心</strong><br>Consul支持开箱即用的多数据中心。这意味着用户不需要担心需要建立额外的抽象层让业务扩展到多个区域。</p>
+</li>
+</ul>
+<p>这里框架主要介绍服务发现和健康检查。</p>
+<h4 id="本地部署"><a href="#本地部署" class="headerlink" title="本地部署"></a>本地部署</h4><p>下载相应版本consul<br>软件包，下载地址：<em><a target="_blank" rel="noopener" href="https://www.consul.io/downloads.html">https://www.consul.io/downloads.html</a></em>，以下内容为windows讲解。承接上面的网关项目，整合Consul。</p>
+<h5 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h5><p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152344361.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>解压完成，只有一个consul.exe，别慌，确实就只有一个文件。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152358502.png" alt="在这里插入图片描述"></p>
+<p>管理员运行CMD ，CD 到consul 文件夹，直接运行 <em>consul</em><br>命令，出现如下页面，则配置成功<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152410103.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h5 id="添加服务配置"><a href="#添加服务配置" class="headerlink" title="添加服务配置"></a>添加服务配置</h5><p>添加服务注册配置文件，在consul.exe<strong>同级目录下</strong>添加<strong>config<br>（名字可自取）</strong>文件夹，在<strong>config</strong><br>文件夹中创建<strong>service.json（名字可自取）</strong>文件，用来注册服务和服务检查配置。如图所示：<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152626261.png" alt="在这里插入图片描述"><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152634355.png" alt="在这里插入图片描述"></p>
+<p>配置service.json，代码如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;services&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;id&quot;</span>: <span class="string">&quot;API1&quot;</span>,<span class="comment">//唯一标识</span></span><br><span class="line">      <span class="string">&quot;name&quot;</span>: <span class="string">&quot;API1&quot;</span>,<span class="comment">//服务名称</span></span><br><span class="line">      <span class="string">&quot;tags&quot;</span>: [ <span class="string">&quot;API1&quot;</span> ],<span class="comment">//服务标签</span></span><br><span class="line">      <span class="string">&quot;address&quot;</span>: <span class="string">&quot;172.0.0.1&quot;</span>,<span class="comment">//我随便配的IP，注意配置服务的真实IP和port</span></span><br><span class="line">      <span class="string">&quot;port&quot;</span>: <span class="number">80</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;id&quot;</span>: <span class="string">&quot;API2&quot;</span>,</span><br><span class="line">      <span class="string">&quot;name&quot;</span>: <span class="string">&quot;API2&quot;</span>,</span><br><span class="line">      <span class="string">&quot;tags&quot;</span>: [ <span class="string">&quot;API2&quot;</span> ],</span><br><span class="line">      <span class="string">&quot;address&quot;</span>: <span class="string">&quot;172.0.0.1&quot;</span>,<span class="comment">//我随便配的IP,注意配置服务的真实IP和port</span></span><br><span class="line">      <span class="string">&quot;port&quot;</span>: <span class="number">81</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样服务注册配置就OK了，接下来使用配置启动Consul，下面是几种形式启动consul，详细的命令参数可以移步到<em>官方文档</em>查看。</p>
+<ul>
+<li><p>以开发模式启动 <strong>consul agent -dev -config-dir=./config</strong></p>
+</li>
+<li><p>以服务方式启动 <strong>consul agent -server -bootstrap-expect 2 -data-dir<br>./tmp/consul -node=n1 -bind=192.168.109.241 -ui-dir ./dist -dc=dc1</strong></p>
+</li>
+<li><p>以客户端方式启动 <strong>consul agent -data-dir ./tmp/consul -ui-dir ./dist<br>-bind=192.168.109.204 -dc=dc1</strong></p>
+</li>
+</ul>
+<p>开发模式启动如下，在输出窗口中可以看到consul ui HTTP 启动路径为<br><strong>127.0.0.1:8500</strong> ，注册了API 和 API2 两个服务。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152658229.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>浏览器访问 127.0.0.1:8500 ，可以看到Consul UI页面</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152711780.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h5 id="添加检查配置"><a href="#添加检查配置" class="headerlink" title="添加检查配置"></a>添加检查配置</h5><p>需要查看服务的运行状态是否健康，就需要配置检查。具体检查配置移步<em>官方文档</em>。</p>
+<p>检查定义有一下几种：</p>
+<p><strong>脚本检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;mem-util&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Memory utilization&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;args&quot;</span>: [<span class="string">&quot;/usr/local/bin/check_mem.py&quot;</span>, <span class="string">&quot;-limit&quot;</span>, <span class="string">&quot;256MB&quot;</span>],</span><br><span class="line">    <span class="attr">&quot;interval&quot;</span>: <span class="string">&quot;10s&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;timeout&quot;</span>: <span class="string">&quot;1s&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>HTTP检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;api&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;HTTP API on port 5000&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;http&quot;</span>: <span class="string">&quot;https://localhost:5000/health&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;tls_skip_verify&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">&quot;method&quot;</span>: <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;header&quot;</span>: &#123;<span class="attr">&quot;x-foo&quot;</span>:[<span class="string">&quot;bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]&#125;,</span><br><span class="line">    <span class="attr">&quot;interval&quot;</span>: <span class="string">&quot;10s&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;timeout&quot;</span>: <span class="string">&quot;1s&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>TCP检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;ssh&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;SSH TCP on port 22&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;tcp&quot;</span>: <span class="string">&quot;localhost:22&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;interval&quot;</span>: <span class="string">&quot;10s&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;timeout&quot;</span>: <span class="string">&quot;1s&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>TTL检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;web-app&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Web App Status&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;notes&quot;</span>: <span class="string">&quot;Web app does a curl internally every 10 seconds&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;ttl&quot;</span>: <span class="string">&quot;30s&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Docker检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;mem-util&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Memory utilization&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;docker_container_id&quot;</span>: <span class="string">&quot;f972c95ebf0e&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;shell&quot;</span>: <span class="string">&quot;/bin/bash&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;args&quot;</span>: [<span class="string">&quot;/usr/local/bin/check_mem.py&quot;</span>],</span><br><span class="line">    <span class="attr">&quot;interval&quot;</span>: <span class="string">&quot;10s&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>gRPC检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;mem-util&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Service health status&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;grpc&quot;</span>: <span class="string">&quot;127.0.0.1:12345&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;grpc_use_tls&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">&quot;interval&quot;</span>: <span class="string">&quot;10s&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>本地服务的别名检查：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;web-alias&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;alias_service&quot;</span>: <span class="string">&quot;web&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我这边简单使用了TCP检查， 继续修改service.json文件，检测 tcp为<br>“172.0.0.1:80”的服务，修改为如下代码：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;services&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;API1&quot;</span>,<span class="comment">//唯一标识</span></span><br><span class="line">      <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;API1&quot;</span>,<span class="comment">//服务名称</span></span><br><span class="line">      <span class="attr">&quot;tags&quot;</span>: [ <span class="string">&quot;API1&quot;</span> ],<span class="comment">//服务标签</span></span><br><span class="line">      <span class="attr">&quot;address&quot;</span>: <span class="string">&quot;172.0.0.1&quot;</span>,<span class="comment">//我随便配的IP，注意配置服务的真实IP和port</span></span><br><span class="line">      <span class="attr">&quot;port&quot;</span>: <span class="number">80</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;API2&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;API2&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;tags&quot;</span>: [ <span class="string">&quot;API2&quot;</span> ],</span><br><span class="line">      <span class="attr">&quot;address&quot;</span>: <span class="string">&quot;172.0.0.1&quot;</span>,<span class="comment">//我随便配的IP,注意配置服务的真实IP和port</span></span><br><span class="line">      <span class="attr">&quot;port&quot;</span>: <span class="number">81</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">&quot;check&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;APICheck&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;APICheck&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;tcp&quot;</span>: <span class="string">&quot;119.29.50.115:80&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;interval&quot;</span>: <span class="string">&quot;10s&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;timeout&quot;</span>: <span class="string">&quot;1s&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>check<br>定义为service同级节点则是为所有服务使用同一个检查规则，定义在services节点内则是具体为某一个服务定义检查规则</strong></p>
+<p>启动如下图，很明显多了一个名叫APICheck 的代理。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152808550.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>启动页面也有不同，checks 为2了，说明check<br>配置成功了。点击某个服务进去可以查看详细信息</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152817472.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152828277.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="docker部署（腾讯云）"><a href="#docker部署（腾讯云）" class="headerlink" title="docker部署（腾讯云）"></a>docker部署（腾讯云）</h4><p>前面说的是本地部署，现在说一下基于腾讯云docker<br>部署。首先拉去docker镜像创建服务。</p>
+<p><strong>Docker Hub（镜像文件库）</strong> 里包含Consul<br>的镜像文件，只需要在Docker创建服务使用镜像就可以了。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152841215.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152849728.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>设置容器端口为8500，服务端口为80，通过Ingress进行路由转发。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/2020070615285976.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>访问服务外网，结果如下，配置成功</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152912376.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="配置Ocelot-网关"><a href="#配置Ocelot-网关" class="headerlink" title="配置Ocelot 网关"></a>配置Ocelot 网关</h4><p>首先修改前面的网关项目ApiGateway Startup.cs 文件里的 ConfigureServices方法，添加<br><strong>.AddConsul()</strong>方法代码如下:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//Identity Server Bearer Tokens</span></span><br><span class="line"></span><br><span class="line">    Action&lt;IdentityServerAuthenticationOptions&gt; isaOpt = option =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        option.Authority = Configuration[<span class="string">&quot;IdentityService:Uri&quot;</span>];</span><br><span class="line">        option.RequireHttpsMetadata = Convert.ToBoolean(Configuration[<span class="string">&quot;IdentityService:UseHttps&quot;</span>]);</span><br><span class="line">        option.ApiName = Configuration[<span class="string">&quot;IdentityService:ApiName&quot;</span>];</span><br><span class="line">        option.ApiSecret = Configuration[<span class="string">&quot;IdentityService:ApiSecret&quot;</span>];</span><br><span class="line">        option.SupportedTokens = SupportedTokens.Both;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    services.AddAuthentication().AddIdentityServerAuthentication(Configuration[<span class="string">&quot;IdentityService:DefaultScheme&quot;</span>], isaOpt);</span><br><span class="line"></span><br><span class="line">    services</span><br><span class="line">        .AddOcelot(Configuration)</span><br><span class="line">        .AddConsul()</span><br><span class="line">        <span class="comment">//启用缓存</span></span><br><span class="line">        .AddCacheManager(x =&gt; &#123; x.WithDictionaryHandle(); &#125;)</span><br><span class="line">        .AddPolly()</span><br><span class="line">        .AddAdministration(<span class="string">&quot;/administration&quot;</span>, isaOpt);</span><br><span class="line">    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); ;</span><br><span class="line">    services.AddSwaggerGen(options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        options.SwaggerDoc(Configuration[<span class="string">&quot;Swagger:Name&quot;</span>], <span class="keyword">new</span> Info &#123; Title = Configuration[<span class="string">&quot;Swagger:Title&quot;</span>], Version = Configuration[<span class="string">&quot;Swagger:Version&quot;</span>] &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来配置ocelot.json 文件，在<strong>GlobalConfiguration</strong><br>节点下添加服务发现提供程序配置</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//服务发现提供程序</span></span><br><span class="line">&quot;ServiceDiscoveryProvider&quot;: &#123;</span><br><span class="line">  &quot;Host&quot;: &quot;111.230.118.59&quot;,</span><br><span class="line">  &quot;Port&quot;: 80,</span><br><span class="line">  &quot;Type&quot;: &quot;PollConsul&quot;,</span><br><span class="line">  &quot;PollingInterval&quot;: 1000</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>项目上游配置添加<strong>ServiceName</strong> 和 <strong>UseServiceDiscovery</strong>属性，代码如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;UpstreamPathTemplate&quot;</span>: <span class="string">&quot;/gateway/2/&#123;url&#125;&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;UpstreamHttpMethod&quot;</span>: [ <span class="string">&quot;Get&quot;</span>, <span class="string">&quot;Post&quot;</span>, <span class="string">&quot;Delete&quot;</span>, <span class="string">&quot;Put&quot;</span> ],</span><br><span class="line">  <span class="attr">&quot;DownstreamPathTemplate&quot;</span>: <span class="string">&quot;/api2/&#123;url&#125;&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;DownstreamScheme&quot;</span>: <span class="string">&quot;http&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;ServiceName&quot;</span>: <span class="string">&quot;API2&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;UseServiceDiscovery&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;LoadBalancer&quot;</span>: <span class="string">&quot;RoundRobin&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;DownstreamHostAndPorts&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;Host&quot;</span>: <span class="string">&quot;111.230.160.62&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;Port&quot;</span>: <span class="number">80</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;Host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;Port&quot;</span>: <span class="number">13002</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">&quot;QoSOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;ExceptionsAllowedBeforeBreaking&quot;</span>: <span class="number">3</span>,</span><br><span class="line">    <span class="attr">&quot;DurationOfBreak&quot;</span>: <span class="number">10</span>,</span><br><span class="line">    <span class="attr">&quot;TimeoutValue&quot;</span>: <span class="number">5000</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="string">&quot;AuthenticationOptions&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;AuthenticationProviderKey&quot;</span>: <span class="string">&quot;IdentityBearer&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;AllowedScopes&quot;</span>: [</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>启动OcelotGateway，API001，API002项目，通过<a target="_blank" rel="noopener" href="http://localhost:13000/gateway/1/values，和http://localhost:13000/gateway/2/values访问；因为Ocelot配置了Consul的服务治理，所以可以通过配置的服务名称和GlobalConfiguratin的Consul">http://localhost:13000/gateway/1/values，和http://localhost:13000/gateway/2/values访问；因为Ocelot配置了Consul的服务治理，所以可以通过配置的服务名称和GlobalConfiguratin的Consul</a><br>http<br>api接口查找到对应服务的地址，进行访问，这些都是Ocelot帮我们做，这点很容易证明，可以修改Consul配置文件中服务的address为错误IP，就会发现通过13000端口访问不成功。</p>
+<h3 id="集成消息队列——CAP"><a href="#集成消息队列——CAP" class="headerlink" title="集成消息队列——CAP"></a>集成消息队列——CAP</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>CAP 是一个基于 .NET Standard 的 C#<br>库，它是一种处理分布式事务的解决方案，同样具有 EventBus<br>的功能，它具有轻量级、易使用、高性能等特点。</p>
+<p>微服务系统的过程中，通常需要使用事件来对各个服务进行集成，在这过程中简单的使用消息队列并不能保证数据的最终一致性，<br>CAP<br>采用的是和当前数据库集成的本地消息表的方案来解决在分布式系统互相调用的各个环节可能出现的异常，它能够保证任何情况下事件消息都是不会丢失的。</p>
+<p>Github 地址：<a target="_blank" rel="noopener" href="https://github.com/dotnetcore/CAP">https://github.com/dotnetcore/CAP</a></p>
+<p>支持消息队列：</p>
+<ul>
+<li><p>Kafka</p>
+</li>
+<li><p>RabbitMQ</p>
+</li>
+<li><p>AzureServiceBus </p>
+</li>
+</ul>
+<p>数据库存储：</p>
+<ul>
+<li><p>Sql Server</p>
+</li>
+<li><p>MySql</p>
+</li>
+<li><p>PostgreSQL</p>
+</li>
+<li><p>MongoDB </p>
+</li>
+</ul>
+<h4 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h4><p>我们以RabbitMQ 与Sql Server来讲解。</p>
+<p>首先我们需要安装RabbitMQ 服务，很简单，<em>官方</em>下载最新的安装包。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152942939.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>但是在安装RabbitMQ<br>时会提示安装Erlang，Erlang是一种通用的面向并发的编程语言，Erlang来编写分布式应用要简单的多。RabbitMQ是用Erlang实现的一个高并发高可靠AMQP消息队列服务器。</p>
+<p><em>官方下载</em>对应的Erlang 安装程序，<strong>建议RabbitMQ和Erlang都安装最新版本</strong></p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706152953628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>安装完成之后，会多了以下几个程序，安装包帮我生成了start、remove、stop等命令程序。我们拿来直接用就可以了，当然你也可以配置环境变量，使用命令启动。先运行start<br>程序运行起来。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153003772.png" alt="在这里插入图片描述"></p>
+<h4 id="Net-Core-集成-CAP"><a href="#Net-Core-集成-CAP" class="headerlink" title=".Net Core 集成 CAP"></a>.Net Core 集成 CAP</h4><p>Nuget 包下载：</p>
+<ul>
+<li><p><strong>DotNetCore.CAP 核心包</strong></p>
+</li>
+<li><p><strong>DotNetCore.CAP.RabbitMQ CAP RabbitMQ 包</strong></p>
+</li>
+<li><p><strong>DotNetCore.CAP.SqlServer CAP Sql Server 扩展包</strong></p>
+</li>
+</ul>
+<p>继续修改测试项目Service.Test1项目，使用CodeFirst生成数据库：</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153034715.png" alt="在这里插入图片描述"></p>
+<p>新建测试类<strong>Test</strong>：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">int</span> Id &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">string</span> Name &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">string</span> Title &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>添加<strong>AppDbContext</strong> 数据库上下文 文件，代码如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AppDbContext</span>:<span class="title">DbContext</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AppDbContext</span>(<span class="params">DbContextOptions&lt;AppDbContext&gt; options</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">options</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">virtual</span> DbSet&lt;Test&gt; Tests &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnModelCreating</span>(<span class="params">ModelBuilder modelBuilder</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.OnModelCreating(modelBuilder);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置数据库连接字符串：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;ConnectionStrings&quot;: &#123;</span><br><span class="line">    &quot;Default&quot;: &quot;Server=(localdb)\\MSSQLLocalDB;  Database=Service_test1; Trusted_Connection=True;&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Program.cs</strong> 文件配置读取appsettings.json文件。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IWebHostBuilder <span class="title">CreateWebHostBuilder</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span> =&gt;</span><br><span class="line">    WebHost.CreateDefaultBuilder(args)</span><br><span class="line">        .ConfigureAppConfiguration((hostingContext, config) =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            config.AddJsonFile(<span class="string">&quot;appsettings.json&quot;</span>, optional: <span class="literal">true</span>, reloadOnChange: <span class="literal">true</span>)</span><br><span class="line">                .AddEnvironmentVariables();</span><br><span class="line">        &#125;)</span><br><span class="line">        .UseStartup&lt;Startup&gt;();</span><br></pre></td></tr></table></figure>
+<p><strong>Startup.cs</strong> 文件<strong>ConfigureServices</strong>添加数据访问配置</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">services.AddDbContext&lt;AppDbContext&gt;(options =&gt;</span><br><span class="line">    options.UseSqlServer(Configuration.GetConnectionString(<span class="string">&quot;Default&quot;</span>)));</span><br><span class="line">services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);</span><br></pre></td></tr></table></figure>
+<p>到这里正常的CodeFirst<br>项目配置已经完成了，直接运行数据迁移命令就可以创建数据库了。</p>
+<p>但是我这里需要集成CAP，肯定这样是不行的。需要进行CAP的配置，继续在<strong>ConfigureServices</strong><br>添加如下代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">services.AddDbContext&lt;AppDbContext&gt;(options =&gt;</span><br><span class="line">    options.UseSqlServer(Configuration.GetConnectionString(<span class="string">&quot;Default&quot;</span>)));</span><br><span class="line">services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);</span><br><span class="line"></span><br><span class="line">Action&lt;CapOptions&gt; capOptions = option =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    option.UseEntityFramework&lt;AppDbContext&gt;();</span><br><span class="line">    option.UseSqlServer(Configuration.GetConnectionString(<span class="string">&quot;Default&quot;</span>));</span><br><span class="line">    option.UseRabbitMQ(<span class="string">&quot;localhost&quot;</span>);<span class="comment">//UseRabbitMQ 服务器地址配置，支持配置IP地址和密码</span></span><br><span class="line">    option.UseDashboard();<span class="comment">//CAP2.X版本以后官方提供了Dashboard页面访问。</span></span><br><span class="line">    <span class="keyword">if</span> (Convert.ToBoolean(Configuration[<span class="string">&quot;Cap:UseConsul&quot;</span>]))</span><br><span class="line">    &#123;</span><br><span class="line">        option.UseDiscovery(discovery =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            discovery.DiscoveryServerHostName = Configuration[<span class="string">&quot;Cap:DiscoveryServerHostName&quot;</span>];</span><br><span class="line">            discovery.DiscoveryServerPort = Convert.ToInt32(Configuration[<span class="string">&quot;Cap:DiscoveryServerPort&quot;</span>]);</span><br><span class="line">            discovery.CurrentNodeHostName = Configuration[<span class="string">&quot;Cap:CurrentNodeHostName&quot;</span>];</span><br><span class="line">            discovery.CurrentNodePort = Convert.ToInt32(Configuration[<span class="string">&quot;Cap:CurrentNodePort&quot;</span>]);</span><br><span class="line">            discovery.NodeId = Convert.ToInt32(Configuration[<span class="string">&quot;Cap:NodeId&quot;</span>]);</span><br><span class="line">            discovery.NodeName = Configuration[<span class="string">&quot;Cap:NodeName&quot;</span>];</span><br><span class="line">            discovery.MatchPath = Configuration[<span class="string">&quot;Cap:MatchPath&quot;</span>];</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">services.AddCap(capOptions);</span><br></pre></td></tr></table></figure>
+<p>RabbitMQ 也是支持配置options</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">option.UseRabbitMQ(cfg =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    cfg.HostName = Configuration[<span class="string">&quot;MQ:Host&quot;</span>];</span><br><span class="line">    cfg.VirtualHost = Configuration[<span class="string">&quot;MQ:VirtualHost&quot;</span>];</span><br><span class="line">    cfg.Port = Convert.ToInt32(Configuration[<span class="string">&quot;MQ:Port&quot;</span>]);</span><br><span class="line">    cfg.UserName = Configuration[<span class="string">&quot;MQ:UserName&quot;</span>];</span><br><span class="line">    cfg.Password = Configuration[<span class="string">&quot;MQ:Password&quot;</span>];</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>CAP 内置集成了Consul<br>服务注册，注册的同时默认携带了简况检查，但是只支持HTTP检查，所以我们需要在接口中定义health<br>路径提供给检查访问。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153052242.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>在appsetting.json 文件中添加相应的配置节点：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&quot;Cap&quot;: &#123;</span><br><span class="line">    &quot;UseConsul&quot;: true,//是否开启</span><br><span class="line">    &quot;CurrentNodeHostName&quot;: &quot;localhost&quot;,//当前节点IP</span><br><span class="line">    &quot;CurrentNodePort&quot;: 13001,//当前节点Port</span><br><span class="line">    &quot;DiscoveryServerHostName&quot;: &quot;127.0.0.1&quot;,//发现服务主机IP</span><br><span class="line">    &quot;DiscoveryServerPort&quot;: 8500,//发现服务主机Port</span><br><span class="line">    &quot;NodeId&quot;: 1,//节点标识</span><br><span class="line">    &quot;NodeName&quot;: &quot;CAP_API1&quot;,//节点名称</span><br><span class="line">    &quot;MatchPath&quot;: &quot;/api1/TestOnes&quot;//健康检查根路劲 最终的路径为api1/TestOnes/health</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进行数据迁移创建数据库，表结构如下：</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153105976.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h5 id="Cap-发布"><a href="#Cap-发布" class="headerlink" title="Cap 发布"></a>Cap 发布</h5><p>接下来就是去使用Cap 发布了，修改<strong>Controller</strong>代码</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestOnesController</span> : <span class="title">ControllerBase</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">readonly</span> ICapPublisher _capBus;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestOnesController</span>(<span class="params">ICapPublisher capPublisher</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        _capBus = capPublisher;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">HttpGet</span>]</span><br><span class="line">    <span class="keyword">public</span> ActionResult&lt;IEnumerable&lt;<span class="built_in">string</span>&gt;&gt; Get()</span><br><span class="line">    &#123;</span><br><span class="line">        _capBus.Publish(<span class="string">&quot;services.test1.show.time&quot;</span>, DateTime.Now);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">string</span>[] &#123; <span class="string">&quot;TestOnes_value1&quot;</span>, <span class="string">&quot;TestOnes_value2&quot;</span> &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//定义路由为health提供给服务检查使用</span></span><br><span class="line">    [<span class="meta">HttpGet</span>]</span><br><span class="line">    [<span class="meta">Route(<span class="meta-string">&quot;health&quot;</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ActionResult&lt;<span class="built_in">string</span>&gt; <span class="title">Health</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Health!!!!!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为启用的Consul ，所以要按照前面说过的consul 教程来启动consul</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153125787.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>访问<em><a target="_blank" rel="noopener" href="http://127.0.0.1:8500">http://127.0.0.1:8500</a></em>，页面如下</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153134601.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>接下来启动项目，还是老样子直接看到如下页面。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153146494.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>但是我们集成了CAP，所以可以访问呢<em><a target="_blank" rel="noopener" href="http://localhost:13001/cap">http://localhost:13001/cap</a></em> 访问cap<br>Dashboard页面查看详细</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153159414.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>这里一般启动的话发出的时不存在，也是因为前面有测试过，数据库里存在了。我们调用api1/TestOnes方法<br>发出消息。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153213375.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>请求成功，在来看看数据库。数据库多了两张表，以张是接收数据表，一张是发布数据表。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153226776.png" alt="在这里插入图片描述"></p>
+<p>再来看看里面的数据，也是就是发布的消息，因为之前请求过四次，我这边就多了四条数据。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153236218.png" alt="在这里插入图片描述"></p>
+<p>cap Dashboard也能看到一些统计和数据列表</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153244730.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153254107.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>再来看看consul 页面，一个CAP_API1 的服务已经被注册进来了</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153303136.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>如果前面 <strong>MatchPath</strong><br>路径没有配置对的话，就会出现下面的情况，导致无法通过健康检查。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153311977.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153320245.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h5 id="Cap-订阅（接收）"><a href="#Cap-订阅（接收）" class="headerlink" title="Cap 订阅（接收）"></a>Cap 订阅（接收）</h5><p>使用API订阅消息，为了方便，使用同一个项目的另一个接口实现订阅</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Route(<span class="meta-string">&quot;api1/[controller]&quot;</span>)</span>]</span><br><span class="line">[<span class="meta">ApiController</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ControllerBase</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">HttpGet(<span class="meta-string">&quot;Received&quot;</span>)</span>]</span><br><span class="line">    [<span class="meta">CapSubscribe(<span class="meta-string">&quot;services.test1.show.time&quot;</span>)</span>]<span class="comment">//配置发布时填写的Name</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ActionResult&lt;<span class="built_in">string</span>&gt; <span class="title">GetReceivedMessage</span>(<span class="params">DateTime datetime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">&quot;订阅:&quot;</span>+datetime);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;订阅:&quot;</span> + datetime;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就OK了，但是如果你时在不同的项目，还是需要像前面一样配置CAP。</p>
+<p>启动项目请求一次CAP发布接口，查看<a target="_blank" rel="noopener" href="http://localhost:13001/cap">http://localhost:13001/cap</a><br>可以看到接收的里面有1条数据</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153339209.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>订阅列表中也有了一条数据</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153349774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>在来看数据库也添加一条数据</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200706153359678.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="最后——附上总体代码"><a href="#最后——附上总体代码" class="headerlink" title="最后——附上总体代码"></a>最后——附上总体代码</h2><p>整个实践代码已托管到Github，具体如下所示：<a target="_blank" rel="noopener" href="https://github.com/magicodes/Magicodes.Simple.Services">https://github.com/magicodes/Magicodes.Simple.Services</a></p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime" title="更新时间"></i>
+              2020-07-06
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags" title="标签"></i>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/NET-CORE/" title=".NET CORE">
+                        <b>#</b> .NET CORE
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" title="微服务">
+                        <b>#</b> 微服务
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/Ocelot/" title="Ocelot">
+                        <b>#</b> Ocelot
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/Consul/" title="Consul">
+                        <b>#</b> Consul
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div class="post-catalog" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E4%BD%93%E4%BB%8B%E7%BB%8D"><span class="toc-text">总体介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">微服务架构的好处</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E4%B8%8D%E8%B6%B3%EF%BC%88%E8%BF%99%E4%B8%AA%E6%97%B6%E5%80%99%E5%B0%B1%E9%9C%80%E8%A6%81%E7%94%A8%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%89"><span class="toc-text">微服务架构的不足（这个时候就需要用到服务发现）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%A0%E7%BB%9F%E6%A8%A1%E5%BC%8F"><span class="toc-text">传统模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Ocelot%EF%BC%88%E7%BD%91%E5%85%B3%EF%BC%89%E6%A8%A1%E5%BC%8F"><span class="toc-text">Ocelot（网关）模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E6%88%90IdentityService%EF%BC%88%E8%AE%A4%E8%AF%81%EF%BC%89"><span class="toc-text">集成IdentityService（认证）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E6%88%90consul%EF%BC%88%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%89"><span class="toc-text">集成consul（服务发现）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84"><span class="toc-text">搭建一个简单的微服务架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ocelot"><span class="toc-text">Ocelot</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E9%9B%86%E6%88%90"><span class="toc-text">基本集成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0Ocelot"><span class="toc-text">添加Ocelot</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95API%E9%A1%B9%E7%9B%AE"><span class="toc-text">添加测试API项目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%B8%8A%E6%B8%B8%E8%AF%B7%E6%B1%82%E5%AF%B9%E8%B1%A1%EF%BC%88ocelot-json%EF%BC%89"><span class="toc-text">配置项目的上游请求对象（ocelot.json）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E7%BB%93%E6%9E%9C"><span class="toc-text">启动结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%81%9A%E5%90%88API%E6%96%87%E6%A1%A3%EF%BC%88SwaggerUI%EF%BC%89"><span class="toc-text">聚合API文档（SwaggerUI）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ConfigureServices"><span class="toc-text">ConfigureServices</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Configure"><span class="toc-text">Configure</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#appsettings-json"><span class="toc-text">appsettings.json</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AESwagger%E7%9A%84%E4%B8%8A%E6%B8%B8%E8%AF%B7%E6%B1%82%E5%AF%B9%E8%B1%A1%EF%BC%88ocelot-json%EF%BC%89"><span class="toc-text">配置Swagger的上游请求对象（ocelot.json）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E7%BB%93%E6%9E%9C-1"><span class="toc-text">启动结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IdentityServer-%E9%9B%86%E6%88%90"><span class="toc-text">IdentityServer 集成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%8E%88%E6%9D%83%E6%9C%8D%E5%8A%A1%E9%A1%B9%E7%9B%AE"><span class="toc-text">添加授权服务项目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEappsetting-json"><span class="toc-text">配置appsetting.json</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0IdentityServerConfig%E7%B1%BB"><span class="toc-text">添加IdentityServerConfig类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89API%E8%B5%84%E6%BA%90%EF%BC%9A"><span class="toc-text">定义API资源：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E8%BA%AB%E4%BB%BD%E8%B5%84%E6%BA%90%EF%BC%9A"><span class="toc-text">定义身份资源：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E6%B5%8B%E8%AF%95%E5%AE%A2%E6%9C%8D%E7%AB%AF"><span class="toc-text">定义测试客服端</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEStartup"><span class="toc-text">配置Startup</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ConfigureServices-1"><span class="toc-text">ConfigureServices</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Configure-1"><span class="toc-text">Configure</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E7%BB%93%E6%9E%9C-2"><span class="toc-text">启动结果</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEApiGateway%E7%BD%91%E5%85%B3%E9%A1%B9%E7%9B%AE"><span class="toc-text">配置ApiGateway网关项目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E7%94%A8Ocelot%E7%AE%A1%E7%90%86API"><span class="toc-text">调用Ocelot管理API</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#API%E6%96%B9%E6%B3%95"><span class="toc-text">API方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Consul%EF%BC%88%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%89"><span class="toc-text">Consul（服务发现）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2"><span class="toc-text">本地部署</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%9C%8D%E5%8A%A1%E9%85%8D%E7%BD%AE"><span class="toc-text">添加服务配置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%A3%80%E6%9F%A5%E9%85%8D%E7%BD%AE"><span class="toc-text">添加检查配置</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#docker%E9%83%A8%E7%BD%B2%EF%BC%88%E8%85%BE%E8%AE%AF%E4%BA%91%EF%BC%89"><span class="toc-text">docker部署（腾讯云）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEOcelot-%E7%BD%91%E5%85%B3"><span class="toc-text">配置Ocelot 网关</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E6%88%90%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E2%80%94%E2%80%94CAP"><span class="toc-text">集成消息队列——CAP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-text">环境准备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Net-Core-%E9%9B%86%E6%88%90-CAP"><span class="toc-text">.Net Core 集成 CAP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Cap-%E5%8F%91%E5%B8%83"><span class="toc-text">Cap 发布</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Cap-%E8%AE%A2%E9%98%85%EF%BC%88%E6%8E%A5%E6%94%B6%EF%BC%89"><span class="toc-text">Cap 订阅（接收）</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E2%80%94%E2%80%94%E9%99%84%E4%B8%8A%E6%80%BB%E4%BD%93%E4%BB%A3%E7%A0%81"><span class="toc-text">最后——附上总体代码</span></a></li></ol>
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+  <div id="vcomments"></div>
+
+  <script>
+    new Valine({
+      el: '#vcomments',
+      appId: 'j73OlR745tdiYMdFRzbTPDrO-gzGzoHsz',
+      appKey: 'mhyUfuvzMqhq02Fjxk41wc25',
+      placeholder: 'Welcome!',
+      avatar: 'retro',
+      lang: 'zh-CN'
+    })
+  </script>
+
+    <style>
+      .comments-container .v .vempty {
+        display: none!important;
+      }
+    </style>
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        <div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/CacoCode/">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+        <li>
+          <a title="rss" href="/atom.xml">
+            <i class="iconfont icon-rss"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    <div class="footer-more">
+      <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © CodePlus 2021</a>
+    </div>
+  
+    <div class="footer-more">
+      <a target="_blank" rel="noopener" href="http://www.beian.miit.gov.cn">湘ICP备16012270号</a>
+    </div>
+  
+</div>
+
+      </div>
+
+      <div class="back-to-top hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+      
+  <div class="search-icon" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+    </div>
+  <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(n){n.imageLazyLoadSetting.processImages=i;var e=n.imageLazyLoadSetting.isSPA,r=Array.prototype.slice.call(document.querySelectorAll("img[data-original]"));function i(){e&&(r=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")));for(var t,a=0;a<r.length;a++)0<=(t=(t=r[a]).getBoundingClientRect()).bottom&&0<=t.left&&t.top<=(n.innerHeight||document.documentElement.clientHeight)&&function(){var t,e,n,i,o=r[a];t=o,e=function(){r=r.filter(function(t){return o!==t})},n=new Image,i=t.getAttribute("data-original"),n.onload=function(){t.src=i,e&&e()},n.src=i}()}i(),n.addEventListener("scroll",function(){var t,e;t=i,e=n,clearTimeout(t.tId),t.tId=setTimeout(function(){t.call(e)},500)})}(this);</script></body>
+</html>

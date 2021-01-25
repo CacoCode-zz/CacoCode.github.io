@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zcheng.site/"/>
-  <updated>2021-01-25T03:03:24.267Z</updated>
+  <updated>2021-01-25T03:41:28.918Z</updated>
   <id>https://zcheng.site/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Canvas学习与实践 - 基于Canvas的像素画板实现</title>
-    <link href="https://zcheng.site/pixel-drawing-board.html"/>
-    <id>https://zcheng.site/pixel-drawing-board.html</id>
-    <published>2020-09-27T10:42:38.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
+    <title>详解.NET Core 依赖注入生命周期</title>
+    <link href="https://zcheng.site/%E6%9E%84%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E7%AE%80%E5%8D%95%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84.html"/>
+    <id>https://zcheng.site/%E6%9E%84%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E7%AE%80%E5%8D%95%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84.html</id>
+    <published>2020-07-06T15:36:34.000Z</published>
+    <updated>2021-01-25T03:41:28.918Z</updated>
     
     <summary type="html">
     
@@ -29,134 +29,27 @@
       
         
         
-          &lt;p&gt;最近在学习Canvas，想到之前说到的&lt;a href=&quot;./pixel-icon-design.html&quot;&gt;Css像素画&lt;/a&gt;能不能基于Canvas来设计，正好Canvas处理与绘画图像很强大，并且可以精确到控制每一个像素，还挺适合作为一个像素画板的。&lt;/p&gt;
-&lt;h3
+          &lt;h2 id=&quot;总体介绍&quot;&gt;&lt;a href=&quot;#总体介绍&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
     
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
+      <category term=".NET CORE" scheme="https://zcheng.site/categories/NET-CORE/"/>
+    
+      <category term="微服务" scheme="https://zcheng.site/categories/NET-CORE/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+      <category term="架构" scheme="https://zcheng.site/categories/NET-CORE/%E5%BE%AE%E6%9C%8D%E5%8A%A1/%E6%9E%B6%E6%9E%84/"/>
     
     
-      <category term="HTML" scheme="https://zcheng.site/tags/HTML/"/>
+      <category term=".NET CORE" scheme="https://zcheng.site/tags/NET-CORE/"/>
     
-      <category term="Canvas" scheme="https://zcheng.site/tags/Canvas/"/>
+      <category term="微服务" scheme="https://zcheng.site/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
     
-  </entry>
-  
-  <entry>
-    <title>CSS像素图标设计（持续更新⏳）</title>
-    <link href="https://zcheng.site/pixel-icon-design.html"/>
-    <id>https://zcheng.site/pixel-icon-design.html</id>
-    <published>2020-06-03T21:26:51.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
+      <category term="Ocelot" scheme="https://zcheng.site/tags/Ocelot/"/>
     
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link href=&quot;/scss/pixel-icon-design/base.css&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="CSS" scheme="https://zcheng.site/tags/CSS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>简易CSS动画设计（持续更新⏳）</title>
-    <link href="https://zcheng.site/css-animation-design.html"/>
-    <id>https://zcheng.site/css-animation-design.html</id>
-    <published>2020-05-26T20:44:52.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link href=&quot;/scss/something-about-css.css&quot; rel=&quot;stylesheet&quot;&gt;&lt;/link&gt;
-&lt;link href=&quot;/scss/css-animation-design/base.css&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="CSS" scheme="https://zcheng.site/tags/CSS/"/>
-    
-      <category term="动画设计" scheme="https://zcheng.site/tags/%E5%8A%A8%E7%94%BB%E8%AE%BE%E8%AE%A1/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>SCSS语法学习与实践 - 将现有项目CSS整合成SCSS</title>
-    <link href="https://zcheng.site/change-syntax-of-css-to-scss.html"/>
-    <id>https://zcheng.site/change-syntax-of-css-to-scss.html</id>
-    <published>2020-05-16T09:44:48.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;a href=&quot;https://sass.bootcss.com/documentation/syntax&quot;&gt;Scss&lt;/a&gt;是&lt;a
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="SCSS" scheme="https://zcheng.site/tags/SCSS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Something about HTML（持续更新⏳）</title>
-    <link href="https://zcheng.site/something-about-html.html"/>
-    <id>https://zcheng.site/something-about-html.html</id>
-    <published>2020-05-15T08:48:04.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;blockquote&gt;
-&lt;p&gt;一切来源于生活，看到或想到感兴趣的东西，仅仅用自己想要的形式表现出来。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&quot;canvas&quot;&gt;&lt;a href=&quot;#canvas&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="HTML" scheme="https://zcheng.site/tags/HTML/"/>
+      <category term="Consul" scheme="https://zcheng.site/tags/Consul/"/>
     
   </entry>
   
@@ -165,7 +58,7 @@
     <link href="https://zcheng.site/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html"/>
     <id>https://zcheng.site/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html</id>
     <published>2020-05-08T00:49:31.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
+    <updated>2021-01-25T03:41:28.918Z</updated>
     
     <summary type="html">
     
@@ -194,7 +87,7 @@
     <link href="https://zcheng.site/Autofac%E5%9C%A8.NET_Core_%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8.html"/>
     <id>https://zcheng.site/Autofac%E5%9C%A8.NET_Core_%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8.html</id>
     <published>2020-05-06T23:40:37.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
+    <updated>2021-01-25T03:41:28.918Z</updated>
     
     <summary type="html">
     
@@ -223,7 +116,7 @@
     <link href="https://zcheng.site/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html"/>
     <id>https://zcheng.site/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html</id>
     <published>2020-05-04T21:24:41.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
+    <updated>2021-01-25T03:41:28.918Z</updated>
     
     <summary type="html">
     
@@ -250,38 +143,11 @@
   </entry>
   
   <entry>
-    <title>Something about CSS（持续更新⏳）</title>
-    <link href="https://zcheng.site/something-about-css.html"/>
-    <id>https://zcheng.site/something-about-css.html</id>
-    <published>2020-05-01T12:03:39.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link href=&quot;/scss/something-about-css.css&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="CSS" scheme="https://zcheng.site/tags/CSS/"/>
-    
-  </entry>
-  
-  <entry>
     <title>ABP框架使用拦截器动态配置租户过滤器</title>
     <link href="https://zcheng.site/ABP%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E6%8B%A6%E6%88%AA%E5%99%A8%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E7%A7%9F%E6%88%B7%E8%BF%87%E6%BB%A4%E5%99%A8.html"/>
     <id>https://zcheng.site/ABP%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E6%8B%A6%E6%88%AA%E5%99%A8%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E7%A7%9F%E6%88%B7%E8%BF%87%E6%BB%A4%E5%99%A8.html</id>
     <published>2020-04-25T00:31:20.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
+    <updated>2021-01-25T03:41:28.918Z</updated>
     
     <summary type="html">
     
@@ -304,290 +170,6 @@
       <category term="ABP" scheme="https://zcheng.site/tags/ABP/"/>
     
       <category term="AOP" scheme="https://zcheng.site/tags/AOP/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>极简主义主题 - Oranges</title>
-    <link href="https://zcheng.site/minimalist-theme-oranges.html"/>
-    <id>https://zcheng.site/minimalist-theme-oranges.html</id>
-    <published>2020-04-18T11:08:18.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;初衷&quot;&gt;&lt;a href=&quot;#初衷&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="Hexo" scheme="https://zcheng.site/categories/Hexo/"/>
-    
-      <category term="Theme design" scheme="https://zcheng.site/categories/Hexo/Theme-design/"/>
-    
-    
-      <category term="Hexo" scheme="https://zcheng.site/tags/Hexo/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>疫情期间的居家生活</title>
-    <link href="https://zcheng.site/home-life-during-COVID-19.html"/>
-    <id>https://zcheng.site/home-life-during-COVID-19.html</id>
-    <published>2020-03-25T14:48:35.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;回家&quot;&gt;&lt;a href=&quot;#回家&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="生活" scheme="https://zcheng.site/categories/%E7%94%9F%E6%B4%BB/"/>
-    
-    
-      <category term="生活" scheme="https://zcheng.site/tags/%E7%94%9F%E6%B4%BB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>2019年度总结</title>
-    <link href="https://zcheng.site/2019-summary.html"/>
-    <id>https://zcheng.site/2019-summary.html</id>
-    <published>2020-01-01T20:03:32.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;又是一年末，回顾这一年。有付出，有收获；有进步，也有不足。现就个人本年度重要工作情况总结如下：&lt;/p&gt;
-&lt;h4 id=&quot;一、底层框架升级&quot;&gt;&lt;a href=&quot;#一、底层框架升级&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="个人总结" scheme="https://zcheng.site/categories/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/"/>
-    
-    
-      <category term="个人总结" scheme="https://zcheng.site/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>技术分享之机器学习</title>
-    <link href="https://zcheng.site/machine-learning.html"/>
-    <id>https://zcheng.site/machine-learning.html</id>
-    <published>2019-10-25T18:01:28.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;img src=&quot;https://qiniu.zcheng.site/machine-learning-machine-learning1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="机器学习" scheme="https://zcheng.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Vue transition 折叠类动画自动获取隐藏层高度以及手风琴效果实现</title>
-    <link href="https://zcheng.site/vue-transition.html"/>
-    <id>https://zcheng.site/vue-transition.html</id>
-    <published>2019-07-13T12:37:58.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;前段时间，在解决左侧导航栏激活问题时，发现折叠动画过渡不是很平滑，并且还伴随着一些bug。使用起来不是很流畅，于是在解决完激活bug后，我决定把动画效果也解决掉。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&quot;要解决的问题&quot;&gt;&lt;a href=&quot;#要解决的问题&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="CSS" scheme="https://zcheng.site/tags/CSS/"/>
-    
-      <category term="VUE" scheme="https://zcheng.site/tags/VUE/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>2018年终总结与规划</title>
-    <link href="https://zcheng.site/2018-summary.html"/>
-    <id>https://zcheng.site/2018-summary.html</id>
-    <published>2019-02-03T14:19:04.000Z</published>
-    <updated>2021-01-25T03:03:24.263Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;2018年已经过去，回首这一年，对我来说是颇有收获的一年。在这一年里，许多同事给予过我很多帮助，在这里感谢你们。个人技能也在平时不断试错踩坑的过程中得到了一定的提升。同时这一年也是值得深思的一年，思考自己在各方面还有哪些不足，反省自己在工作中的弊病。&lt;/p&gt;
-&lt;p&gt;这一年以
-        
-      
-    
-    </summary>
-    
-    
-      <category term="个人总结" scheme="https://zcheng.site/categories/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/"/>
-    
-    
-      <category term="个人总结" scheme="https://zcheng.site/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>js实现图片转换为Base64</title>
-    <link href="https://zcheng.site/phototobase64.html"/>
-    <id>https://zcheng.site/phototobase64.html</id>
-    <published>2018-12-12T17:19:52.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;Base64是一种基于64个可打印字符来表示二进制数据的表示方法。&lt;br&gt;常用于在通常处理文本数据的场合，表示、传输、存储一些二进制数据，包括MIME的电子邮件及XML的一些复杂数据。&lt;/p&gt;
-&lt;h3 id=&quot;上传图片&quot;&gt;&lt;a href=&quot;#上传图片&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="前端" scheme="https://zcheng.site/categories/%E5%89%8D%E7%AB%AF/"/>
-    
-    
-      <category term="JavaScript" scheme="https://zcheng.site/tags/JavaScript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ssh key密钥生成与使用</title>
-    <link href="https://zcheng.site/sshkeys.html"/>
-    <id>https://zcheng.site/sshkeys.html</id>
-    <published>2018-08-09T12:23:41.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;生成密钥ssh-key&quot;&gt;&lt;a href=&quot;#生成密钥ssh-key&quot; class=&quot;headerlink&quot; title=&quot;生成密钥ssh key&quot;&gt;&lt;/a&gt;生成密钥ssh key&lt;/h3&gt;&lt;h4 id=&quot;第一步&quot;&gt;&lt;a href=&quot;#第一步&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="Others" scheme="https://zcheng.site/categories/Others/"/>
-    
-    
-      <category term="Linux" scheme="https://zcheng.site/tags/Linux/"/>
-    
-      <category term="GIT" scheme="https://zcheng.site/tags/GIT/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>三河古镇一日游</title>
-    <link href="https://zcheng.site/Sanhe.html"/>
-    <id>https://zcheng.site/Sanhe.html</id>
-    <published>2018-07-06T15:38:22.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;二〇〇八年五月二十号(oﾟvﾟ)ノ&lt;/p&gt;
-&lt;p&gt;👣一次偶然的机会(亲姐姐出嫁;-)，让我有机会到安徽省合肥市肥西县–三河古镇。&lt;br&gt;怎么去的？自驾游，全程高速，花了大概半天不到吧（从武汉到合肥—5个小时左右）。&lt;/p&gt;
-&lt;p&gt;👣本人全程大部分时间在睡觉（起床实在是太
-        
-      
-    
-    </summary>
-    
-    
-      <category term="生活" scheme="https://zcheng.site/categories/%E7%94%9F%E6%B4%BB/"/>
-    
-    
-      <category term="生活" scheme="https://zcheng.site/tags/%E7%94%9F%E6%B4%BB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Windows10子系统Ubuntu体验</title>
-    <link href="https://zcheng.site/linux.html"/>
-    <id>https://zcheng.site/linux.html</id>
-    <published>2018-06-21T10:03:20.000Z</published>
-    <updated>2021-01-25T03:03:24.267Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;Windows10更新到1709（或者更早）版本后，Windows10系统自带了一个linux子系统模块，如果你想换个环境写代码，体验体验Winodws10的子系统，就可以接着往下看&lt;/p&gt;
-&lt;h4 id=&quot;前提-必须&quot;&gt;&lt;a href=&quot;#前提-必须&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="Tools" scheme="https://zcheng.site/categories/Tools/"/>
-    
-    
-      <category term="WSL" scheme="https://zcheng.site/tags/WSL/"/>
-    
-      <category term="Linux" scheme="https://zcheng.site/tags/Linux/"/>
     
   </entry>
   
