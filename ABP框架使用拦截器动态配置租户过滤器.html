@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
   
-  <title>详解.NET Core 依赖注入生命周期 | CodePlus</title>
+  <title>ABP框架使用拦截器动态配置租户过滤器 | CodePlus</title>
 
   
     <link rel="apple-touch-icon" href="/images/favicon.png">
@@ -111,11 +111,11 @@
   <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
   <div class="container post-details" id="post-details">
     <div class="post-content">
-      <div class="post-title">详解.NET Core 依赖注入生命周期</div>
+      <div class="post-title">ABP框架使用拦截器动态配置租户过滤器</div>
       <div class="post-attach">
         <span class="post-pubtime">
           <i class="iconfont icon-updatetime" title="更新时间"></i>
-          2020-05-04
+          2020-04-25
         </span>
         
               <span class="post-tags">
@@ -128,8 +128,14 @@
                 </span>
                 
                 <span class="span--tag">
-                  <a href="/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/" title="依赖注入">
-                    <b>#</b> 依赖注入
+                  <a href="/tags/ABP/" title="ABP">
+                    <b>#</b> ABP
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/AOP/" title="AOP">
+                    <b>#</b> AOP
                   </a>
                 </span>
                 
@@ -137,37 +143,35 @@
           
       </div>
       <div class="markdown-body">
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>.NET Core 自带依赖注入框架，支持三种不同生命周期的注入模式：</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近项目要求在ABP框架中根据TenantId是否为空来配置是否禁用租户过滤器。ABP自身给我我们禁用租户过滤器的两种方法<a target="_blank" rel="noopener" href="https://aspnetboilerplate.com/Pages/Documents/Data-Filters">官方文档</a></p>
 <ul>
-<li>Singleton 单例模式</li>
-<li>Scoped 区域模式<ul>
-<li>Transient  瞬时模式</li>
+<li>方法一：使用工作单元<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> people2 = _personRepository.GetAllList();                </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>方法二：全局禁用过滤器</li>
 </ul>
-</li>
-</ul>
-<p>但是常常不知道什么时候使用哪种模式才最合适，接下来我就用代码详细解读一下三种模式</p>
-<h1 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h1><p>首先新建.NET Core  API项目来进行代码测试</p>
-<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200504210113672.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<p>分别新建 Scoped、Singleton、Transient 三种模式的服务与接口，里面写一个GetIndex() 方法获取index ，用来区别服务的生命周期。<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200504210410494.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>三个服务代码都是如此，然后添加依赖注入<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200504210528854.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>最后在控制器中天加测试方法<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200504211403956.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<p>使用 [FromService] 特性注入服务，每次服务注入两次，用来区别服务的变化，输出服务的index，启动项目查看结果<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200504211455243.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<p>上图可以看到单例和区域模式下，两次注入的服务index是叠加的，可以说明两次服务注入的都是同一个。而瞬时模式两次注入的服务index都是初始值，也就说明两次服务都是新的。然后我们不停止项目在执行一次方法<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200504211849227.png#pic_center" alt="在这里插入图片描述"><br>可以看到单列模式和区域模式有了不同，单例模式注入的服务，index值一直在叠加，而区域模式有重新从0开始叠加。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>结合以上示例可以清楚的分别三种模式的差别</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Configuration.UnitOfWork.OverrideFilter(AbpDataFilters.MayHaveTenant, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<p>但是方法一要修改的地方很多，嫌麻烦；方法二只能全局在Configuration中配置，不能动态改变，也不合适。于是我查阅了APB <a target="_blank" rel="noopener" href="https://aspnetboilerplate.com/Pages/Documents/Articles/Aspect-Oriented-Programming-using-Interceptors/index.html">AOP和拦截技术</a>，另外查阅了ABP自身注册了拦截器——UnitOfWorkRegistrar，会默认为继承自IRepository或者是IApplicationService的两种类型添加UnitOfWork特性，于是便可以通过拦截方法去实现动态禁用过滤器。</p>
+<h1 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h1><p>首先在Application 层新建一个<strong>TenantInterceptor</strong> 继承<strong>IInterceptor</strong>接口</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TenantInterceptor</span> : <span class="title">IInterceptor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> ILogger Logger &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TenantInterceptor</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Logger = NullLogger.Instance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Intercept</span>(<span class="params">IInvocation invocation</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 从invocation中拿到当前注册进来的工作单元，主要用于获取TenantId</span></span><br><span class="line">        Type t = invocation.InvocationTarget.GetType();</span><br><span class="line">        <span class="keyword">var</span> unitOfWorkManager = (t.GetProperty(<span class="string">&quot;UnitOfWorkManager&quot;</span>).GetValue(invocation.InvocationTarget)) <span class="keyword">as</span> IUnitOfWorkManager;</span><br><span class="line">        <span class="comment">//根据TenantId是否禁用租户过滤器</span></span><br><span class="line">        <span class="keyword">if</span> (unitOfWorkManager.Current.GetTenantId().HasValue)</span><br><span class="line">        &#123;</span><br><span class="line">            invocation.Proceed(); <span class="comment">// 执行方法体</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">        	<span class="comment">// 禁用租户</span></span><br><span class="line">        	<span class="comment">// PS:这里不可以使用 using      	</span></span><br><span class="line">            unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant);</span><br><span class="line">            invocation.Proceed(); <span class="comment">// 执行方法体</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>拦截器里的内容很简单，主要就是根据工作单元获取TenantId来动态禁用过滤器。因为这里没有需要返回的东西，也就不用分同步异步去拦截。<br>接下来就是为所需要禁用租户过滤器的类注册拦截器</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">TenantInterceptorRegistrar</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params">IKernel kernel</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line"></span><br><span class="line">        kernel.ComponentRegistered += Kernel_ComponentRegistered;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Kernel_ComponentRegistered</span>(<span class="params"><span class="built_in">string</span> key, IHandler handler</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> implementationType = handler.ComponentModel.Implementation.GetTypeInfo();</span><br><span class="line">        <span class="comment">// 为实现了接口IRepository接口的所有类注册拦截器</span></span><br><span class="line">        <span class="comment">//if (typeof(IRepository).IsAssignableFrom(implementationType))</span></span><br><span class="line">        <span class="comment">//&#123;</span></span><br><span class="line">        <span class="comment">//    handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(TenantInterceptor)));</span></span><br><span class="line">        <span class="comment">//&#125;</span></span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 为指定类注册拦截器</span></span><br><span class="line">        <span class="keyword">if</span> (InternalAsyncHelper.DisableFilterTenantTypes.Any(a =&gt; a.IsAssignableFrom(implementationType)))</span><br><span class="line">        &#123;</span><br><span class="line">            handler.ComponentModel.Interceptors.Add(<span class="keyword">new</span> InterceptorReference(<span class="keyword">typeof</span>(TenantInterceptor)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">internal</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">InternalAsyncHelper</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Type[] DisableFilterTenantTypes =</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">typeof</span>(IRepository&lt;Student,Guid&gt;),</span><br><span class="line">        <span class="keyword">typeof</span>(IRepository&lt;School,Guid&gt;)</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<strong>TenantInterceptorRegistrar</strong>的<strong>Initialize</strong>方法中，首先会注入整个ABP系统中唯一的IIocManager,然后就是订阅唯一的IocContainer这个容器的ComponentRegistered事件，在订阅事件中首先是获取当前触发此事件的类型信息，然后根据需求注册<strong>TenantInterceptor</strong>这个拦截器。</p>
+<p><strong>这里有一点需要注意，本来想为实现了IApplicationService接口的类注册拦截器，但是ASP.NET Boilerplate使用动态方法拦截的功能有一些限制</strong></p>
 <ul>
-<li><p>Singleton<br>单例模式，服务在第一次请求时被创建，其后的每次请求都沿用这个已创建的服务。</p>
-</li>
-<li><p>Scoped<br>作用域模式，服务在每次请求时被创建，整个请求过程中都贯穿使用这个创建的服务。</p>
-</li>
+<li>如果通过接口调用该方法，则可以将其用于任何公共方法（例如，通过接口使用的Application Services）。</li>
+<li>如果直接从类引用（例如ASP.NET MVC或Web API控制器）中调用方法，则该方法应为虚拟方法。</li>
+<li>一种方法应该是虚拟的，如果它的保护。</li>
 </ul>
-<ul>
-<li>Transient 　　　<br>瞬态模式，服务在每次请求时被创建</li>
-</ul>
+<p><strong>也就是如果将服务作为客户端的Web API控制器公开，那么方法必须是虚方法（virtual）</strong> 附上<a target="_blank" rel="noopener" href="https://github.com/aspnetboilerplate/aspnetboilerplate/issues/3237">官方Git issues</a></p>
+<p>最后一步就是把拦截器在模块文件中初始化</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ApplicationCoreModule</span> : <span class="title">AbpModule</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">PreInitialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        TenantInterceptorRegistrar.Initialize(IocManager.IocContainer.Kernel);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就可以按着自己的需要在<strong>DisableFilterTenantTypes</strong>  中配置自己想配置的仓储了。</p>
 
       </div>
       
         <div class="prev-or-next">
           <div class="post-foot-next">
             
-              <a href="/something-about-css.html" target="_self">
+              <a href="/minimalist-theme-oranges.html" target="_self">
                 <i class="iconfont icon-chevronleft"></i>
                 <span>上一页</span>
               </a>
@@ -176,7 +180,7 @@
           <div class="post-attach">
             <span class="post-pubtime">
               <i class="iconfont icon-updatetime" title="更新时间"></i>
-              2020-05-04
+              2020-04-25
             </span>
             
                   <span class="post-tags">
@@ -189,8 +193,14 @@
                     </span>
                     
                     <span class="span--tag">
-                      <a href="/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/" title="依赖注入">
-                        <b>#</b> 依赖注入
+                      <a href="/tags/ABP/" title="ABP">
+                        <b>#</b> ABP
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/AOP/" title="AOP">
+                        <b>#</b> AOP
                       </a>
                     </span>
                     
@@ -199,7 +209,7 @@
           </div>
           <div class="post-foot-prev">
             
-              <a href="/Autofac%E5%9C%A8.NET_Core_%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8.html" target="_self">
+              <a href="/something-about-css.html" target="_self">
                 <span>下一页</span>
                 <i class="iconfont icon-chevronright"></i>
               </a>
@@ -212,7 +222,7 @@
   <div class="post-catalog" id="catalog">
     <div class="title">目录</div>
     <div class="catalog-content">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="toc-text">代码示例</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">具体实现</span></a></li></ol>
     </div>
   </div>
 

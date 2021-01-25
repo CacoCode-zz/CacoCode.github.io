@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zcheng.site/"/>
-  <updated>2021-01-25T02:53:03.566Z</updated>
+  <updated>2021-01-25T03:03:24.267Z</updated>
   <id>https://zcheng.site/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://zcheng.site/pixel-drawing-board.html"/>
     <id>https://zcheng.site/pixel-drawing-board.html</id>
     <published>2020-09-27T10:42:38.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -51,7 +51,7 @@
     <link href="https://zcheng.site/pixel-icon-design.html"/>
     <id>https://zcheng.site/pixel-icon-design.html</id>
     <published>2020-06-03T21:26:51.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -78,7 +78,7 @@
     <link href="https://zcheng.site/css-animation-design.html"/>
     <id>https://zcheng.site/css-animation-design.html</id>
     <published>2020-05-26T20:44:52.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -108,7 +108,7 @@
     <link href="https://zcheng.site/change-syntax-of-css-to-scss.html"/>
     <id>https://zcheng.site/change-syntax-of-css-to-scss.html</id>
     <published>2020-05-16T09:44:48.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -135,7 +135,7 @@
     <link href="https://zcheng.site/something-about-html.html"/>
     <id>https://zcheng.site/something-about-html.html</id>
     <published>2020-05-15T08:48:04.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -161,11 +161,69 @@
   </entry>
   
   <entry>
+    <title>OData——让查询变的随心所欲</title>
+    <link href="https://zcheng.site/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html"/>
+    <id>https://zcheng.site/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html</id>
+    <published>2020-05-08T00:49:31.000Z</published>
+    <updated>2021-01-25T03:03:24.267Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;OData是什么&quot;&gt;&lt;a href=&quot;#OData是什么&quot; class=&quot;headerlink&quot; title=&quot;OData是什么&quot;&gt;&lt;/a&gt;OData是什么&lt;/h1&gt;&lt;p&gt;Open Data
+        
+      
+    
+    </summary>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/categories/NET-CORE/"/>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/tags/NET-CORE/"/>
+    
+      <category term="OData" scheme="https://zcheng.site/tags/OData/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Autofac在.NET Core 中的使用</title>
+    <link href="https://zcheng.site/Autofac%E5%9C%A8.NET_Core_%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8.html"/>
+    <id>https://zcheng.site/Autofac%E5%9C%A8.NET_Core_%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8.html</id>
+    <published>2020-05-06T23:40:37.000Z</published>
+    <updated>2021-01-25T03:03:24.267Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;Autofac 是一款.NET IoC 容器 . 它管理类之间的依赖关系, 从而使应用在规模及复杂性增长的情况下依然可以轻易地修改
+        
+      
+    
+    </summary>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/categories/NET-CORE/"/>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/tags/NET-CORE/"/>
+    
+      <category term="Autofac" scheme="https://zcheng.site/tags/Autofac/"/>
+    
+  </entry>
+  
+  <entry>
     <title>详解.NET Core 依赖注入生命周期</title>
     <link href="https://zcheng.site/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html"/>
     <id>https://zcheng.site/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html</id>
     <published>2020-05-04T21:24:41.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -196,7 +254,7 @@
     <link href="https://zcheng.site/something-about-css.html"/>
     <id>https://zcheng.site/something-about-css.html</id>
     <published>2020-05-01T12:03:39.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -219,11 +277,42 @@
   </entry>
   
   <entry>
+    <title>ABP框架使用拦截器动态配置租户过滤器</title>
+    <link href="https://zcheng.site/ABP%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E6%8B%A6%E6%88%AA%E5%99%A8%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E7%A7%9F%E6%88%B7%E8%BF%87%E6%BB%A4%E5%99%A8.html"/>
+    <id>https://zcheng.site/ABP%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E6%8B%A6%E6%88%AA%E5%99%A8%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E7%A7%9F%E6%88%B7%E8%BF%87%E6%BB%A4%E5%99%A8.html</id>
+    <published>2020-04-25T00:31:20.000Z</published>
+    <updated>2021-01-25T03:03:24.267Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;最近项目要求在ABP框架中根据TenantId是否为空来配置是否禁用租户过滤器。ABP自身给我我们禁用租户过滤器的两种方法&lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/categories/NET-CORE/"/>
+    
+    
+      <category term=".NET CORE" scheme="https://zcheng.site/tags/NET-CORE/"/>
+    
+      <category term="ABP" scheme="https://zcheng.site/tags/ABP/"/>
+    
+      <category term="AOP" scheme="https://zcheng.site/tags/AOP/"/>
+    
+  </entry>
+  
+  <entry>
     <title>极简主义主题 - Oranges</title>
     <link href="https://zcheng.site/minimalist-theme-oranges.html"/>
     <id>https://zcheng.site/minimalist-theme-oranges.html</id>
     <published>2020-04-18T11:08:18.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -252,7 +341,7 @@
     <link href="https://zcheng.site/home-life-during-COVID-19.html"/>
     <id>https://zcheng.site/home-life-during-COVID-19.html</id>
     <published>2020-03-25T14:48:35.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -279,7 +368,7 @@
     <link href="https://zcheng.site/2019-summary.html"/>
     <id>https://zcheng.site/2019-summary.html</id>
     <published>2020-01-01T20:03:32.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -307,7 +396,7 @@
     <link href="https://zcheng.site/machine-learning.html"/>
     <id>https://zcheng.site/machine-learning.html</id>
     <published>2019-10-25T18:01:28.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -332,7 +421,7 @@
     <link href="https://zcheng.site/vue-transition.html"/>
     <id>https://zcheng.site/vue-transition.html</id>
     <published>2019-07-13T12:37:58.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -363,7 +452,7 @@
     <link href="https://zcheng.site/2018-summary.html"/>
     <id>https://zcheng.site/2018-summary.html</id>
     <published>2019-02-03T14:19:04.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.263Z</updated>
     
     <summary type="html">
     
@@ -391,7 +480,7 @@
     <link href="https://zcheng.site/phototobase64.html"/>
     <id>https://zcheng.site/phototobase64.html</id>
     <published>2018-12-12T17:19:52.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -419,7 +508,7 @@
     <link href="https://zcheng.site/sshkeys.html"/>
     <id>https://zcheng.site/sshkeys.html</id>
     <published>2018-08-09T12:23:41.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -448,7 +537,7 @@
     <link href="https://zcheng.site/Sanhe.html"/>
     <id>https://zcheng.site/Sanhe.html</id>
     <published>2018-07-06T15:38:22.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -477,7 +566,7 @@
     <link href="https://zcheng.site/linux.html"/>
     <id>https://zcheng.site/linux.html</id>
     <published>2018-06-21T10:03:20.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
+    <updated>2021-01-25T03:03:24.267Z</updated>
     
     <summary type="html">
     
@@ -499,92 +588,6 @@
       <category term="WSL" scheme="https://zcheng.site/tags/WSL/"/>
     
       <category term="Linux" scheme="https://zcheng.site/tags/Linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>hexo一键部署到云服务器</title>
-    <link href="https://zcheng.site/hexo-deploy.html"/>
-    <id>https://zcheng.site/hexo-deploy.html</id>
-    <published>2018-05-01T11:44:37.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;上一篇记录了&lt;a href=&quot;hexo-build.html&quot;&gt;如何搭建一个简易的个人网站&lt;/a&gt;，采用&lt;code&gt;hexo&lt;/code&gt;，&lt;code&gt;github
-        
-      
-    
-    </summary>
-    
-    
-      <category term="Hexo" scheme="https://zcheng.site/categories/Hexo/"/>
-    
-      <category term="Setup and deployment" scheme="https://zcheng.site/categories/Hexo/Setup-and-deployment/"/>
-    
-    
-      <category term="Hexo" scheme="https://zcheng.site/tags/Hexo/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何搭建一个简易的个人网站</title>
-    <link href="https://zcheng.site/hexo-build.html"/>
-    <id>https://zcheng.site/hexo-build.html</id>
-    <published>2018-04-10T12:46:50.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;blockquote&gt;
-&lt;p&gt;以下全部操作均在Ubuntu 18.04.1 LTS中进行测试。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&quot;先做好准备工作&quot;&gt;&lt;a href=&quot;#先做好准备工作&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-    
-      <category term="Hexo" scheme="https://zcheng.site/categories/Hexo/"/>
-    
-      <category term="Setup and deployment" scheme="https://zcheng.site/categories/Hexo/Setup-and-deployment/"/>
-    
-    
-      <category term="Hexo" scheme="https://zcheng.site/tags/Hexo/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="https://zcheng.site/hello-world.html"/>
-    <id>https://zcheng.site/hello-world.html</id>
-    <published>2018-03-28T12:04:50.000Z</published>
-    <updated>2021-01-25T02:53:03.566Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;Hello
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="Hello World" scheme="https://zcheng.site/tags/Hello-World/"/>
     
   </entry>
   

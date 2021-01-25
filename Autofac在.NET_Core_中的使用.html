@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
   
-  <title>Something about HTML（持续更新⏳） | CodePlus</title>
+  <title>Autofac在.NET Core 中的使用 | CodePlus</title>
 
   
     <link rel="apple-touch-icon" href="/images/favicon.png">
@@ -111,19 +111,25 @@
   <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
   <div class="container post-details" id="post-details">
     <div class="post-content">
-      <div class="post-title">Something about HTML（持续更新⏳）</div>
+      <div class="post-title">Autofac在.NET Core 中的使用</div>
       <div class="post-attach">
         <span class="post-pubtime">
           <i class="iconfont icon-updatetime" title="更新时间"></i>
-          2020-05-15
+          2020-05-06
         </span>
         
               <span class="post-tags">
                 <i class="iconfont icon-tags" title="标签"></i>
                 
                 <span class="span--tag">
-                  <a href="/tags/HTML/" title="HTML">
-                    <b>#</b> HTML
+                  <a href="/tags/NET-CORE/" title=".NET CORE">
+                    <b>#</b> .NET CORE
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/Autofac/" title="Autofac">
+                    <b>#</b> Autofac
                   </a>
                 </span>
                 
@@ -131,16 +137,43 @@
           
       </div>
       <div class="markdown-body">
-        <blockquote>
-<p>一切来源于生活，看到或想到感兴趣的东西，仅仅用自己想要的形式表现出来。</p>
-</blockquote>
-<h2 id="canvas"><a href="#canvas" class="headerlink" title="canvas"></a>canvas</h2><h2 id="websocket"><a href="#websocket" class="headerlink" title="websocket"></a>websocket</h2><h2 id="others"><a href="#others" class="headerlink" title="others"></a>others</h2>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>Autofac 是一款.NET IoC 容器 . 它管理类之间的依赖关系, 从而使应用在规模及复杂性增长的情况下依然可以轻易地修改 。<br>.NET CORE 中也内置了依赖注入，但是有些情况下需要用到Autofac去进行依赖注入，Autofac支持的所有注入方式以外，还支持属性注入和方法注入。接下来我们通过示例来简单了解Autofac的使用</p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>新建两个.NET CORE 项目，一个WEB层，一个服务层</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/2020050623032390.png" alt="在这里插入图片描述"></p>
+<p>服务层中添加几个测试服务和模块文件</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200506230427891.png" alt="在这里插入图片描述"></p>
+<p>服务代码都如图所示</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200506230507972.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>引入Autofac Nuget包文件</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200506230817823.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>NetCoreAutofacServiceModule 类继承Autofac.Module，并重写Autofac管道中的Load方法，如下图多种方式注入服务。</p>
+<p><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200506230652922.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>接下来就是在WEB层配置Autofac，这里需要注意的是.Net Core2+ 和 .Net Core3+ 的配置方法稍有不同</p>
+<p> <strong><em>.NET CORE 2+</em></strong></p>
+<p>在NET Core 2.1时候，AutoFac返回一个 IServiceProvider 参数注入到ConfigureServices .NET Core 服务中，写法如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> IServiceProvider <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    services.AddControllers();</span><br><span class="line">    <span class="keyword">return</span> AutofacProvider.RegisterForNetCore2(services);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将定义的策略和AutoFac 一起替换内置DI</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IServiceProvider <span class="title">RegisterForNetCore2</span>(<span class="params">IServiceCollection services</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line">    builder.Populate(services);</span><br><span class="line">    <span class="comment">//按模块注入服务</span></span><br><span class="line">    builder.RegisterModule&lt;NetCoreAutofacServiceModule&gt;(); </span><br><span class="line">    <span class="keyword">var</span> Container = builder.Build();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> AutofacServiceProvider(Container);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> <strong><em>.NET CORE 3+</em></strong> </p>
+<p> 在.NET Core3.0 使用上面的写法，框架运行之后会报错：</p>
+<p> <strong>ConfigureServices returning an System.IServiceProvider isn’t supported.</strong></p>
+<p>.NET Core 3.0 引入了具有强类型容器配置的功能。它提供了 ConfigureContainer 方法，可以在其中使用Autofac来注册事物，而不必通过 ServiceCollection 来注册事物。首先需要在 Program.cs 中修改服务工厂，内置是 ServiceProviderFactory 的，修改指定为： AutofacServiceProviderFactory 。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IHostBuilder <span class="title">CreateHostBuilder</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span> =&gt;</span><br><span class="line">    Host.CreateDefaultBuilder(args)</span><br><span class="line">        .ConfigureWebHostDefaults(webBuilder =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            webBuilder.UseStartup&lt;Startup&gt;();</span><br><span class="line">        &#125;)</span><br><span class="line">    .UseServiceProviderFactory(<span class="keyword">new</span> AutofacServiceProviderFactory());</span><br></pre></td></tr></table></figure>
+<p>　然后在 Startup.cs 中添加方法 ConfigureContainer ，并配置Autofac策略
+　</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureContainer</span>(<span class="params">ContainerBuilder builder</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    AutofacProvider.RegisterForNetCore3(builder);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">RegisterForNetCore3</span>(<span class="params">ContainerBuilder builder</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    builder.RegisterModule&lt;NetCoreAutofacServiceModule&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后在控制器中依赖注入服务，可以在方法上用[FromServices]注入，也可以通过构造函数注入</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpGet</span>]</span><br><span class="line">[<span class="meta">Route(<span class="meta-string">&quot;GetName&quot;</span>)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="built_in">string</span> <span class="title">GetName</span>(<span class="params">[FromServices] IThreeRepository threeRepository, </span></span></span><br><span class="line"><span class="function"><span class="params">    [FromServices] IOneService oneService,</span></span></span><br><span class="line"><span class="function"><span class="params">    [FromServices] ITwoService twoService</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">$&quot;【threeRepository】 : <span class="subst">&#123;threeRepository.GetName()&#125;</span>; 【oneService】 : <span class="subst">&#123;oneService.GetName()&#125;</span> ; 【twoService】 : <span class="subst">&#123;twoService.GetName()&#125;</span>&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>启动服务看看结果<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/2020050623340457.png" alt="在这里插入图片描述"><br>服务已经注册成功<br>ThreeRepository 与 IThreeRepository 通过 RegisterType 方法注册；</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.RegisterType&lt;ThreeRepository&gt;().AsImplementedInterfaces();</span><br></pre></td></tr></table></figure>
+<p>OneService、IOneService、TwoService、ITwoService 则是通过RegisterAssemblyTypes方式注册；</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.RegisterAssemblyTypes(<span class="keyword">typeof</span>(NetCoreAutofacServiceModule).Assembly).Where(a =&gt; a.Name.EndsWith(<span class="string">&quot;Service&quot;</span>)).AsImplementedInterfaces();</span><br></pre></td></tr></table></figure>
       </div>
       
         <div class="prev-or-next">
           <div class="post-foot-next">
             
-              <a href="/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html" target="_self">
+              <a href="/%E8%AF%A6%E8%A7%A3.NET_Core_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html" target="_self">
                 <i class="iconfont icon-chevronleft"></i>
                 <span>上一页</span>
               </a>
@@ -149,15 +182,21 @@
           <div class="post-attach">
             <span class="post-pubtime">
               <i class="iconfont icon-updatetime" title="更新时间"></i>
-              2020-05-15
+              2020-05-06
             </span>
             
                   <span class="post-tags">
                     <i class="iconfont icon-tags" title="标签"></i>
                     
                     <span class="span--tag">
-                      <a href="/tags/HTML/" title="HTML">
-                        <b>#</b> HTML
+                      <a href="/tags/NET-CORE/" title=".NET CORE">
+                        <b>#</b> .NET CORE
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/Autofac/" title="Autofac">
+                        <b>#</b> Autofac
                       </a>
                     </span>
                     
@@ -166,7 +205,7 @@
           </div>
           <div class="post-foot-prev">
             
-              <a href="/change-syntax-of-css-to-scss.html" target="_self">
+              <a href="/OData%E2%80%94%E2%80%94%E8%AE%A9%E6%9F%A5%E8%AF%A2%E5%8F%98%E7%9A%84%E9%9A%8F%E5%BF%83%E6%89%80%E6%AC%B2.html" target="_self">
                 <span>下一页</span>
                 <i class="iconfont icon-chevronright"></i>
               </a>
@@ -179,7 +218,7 @@
   <div class="post-catalog" id="catalog">
     <div class="title">目录</div>
     <div class="catalog-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#canvas"><span class="toc-text">canvas</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#websocket"><span class="toc-text">websocket</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#others"><span class="toc-text">others</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-text">示例</span></a></li></ol>
     </div>
   </div>
 
