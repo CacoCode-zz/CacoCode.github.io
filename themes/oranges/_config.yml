@@ -46,8 +46,8 @@ comments:
     clientID: 57fd80ca85f9d3276439
     clientSecret: 7411553827815e5766ebe0bce5e4fb2e36e3217f
     repo: blog
-    owner: zchengsite
-    admin: zchengsite
+    owner: CodePlus
+    admin: CodePlus
     id: location.pathname
     distractionFreeMode: false
 
@@ -55,8 +55,8 @@ comments:
     # https://valine.js.org/quickstart.html#%E8%8E%B7%E5%8F%96APP-ID-%E5%92%8C-APP-Key
     # 进入以上网址查看官方教程
     enable: true
-    appId: j73OlR745tdiYMdFRzbTPDrO-gzGzoHsz
-    appKey: mhyUfuvzMqhq02Fjxk41wc25
+    appId: 02GfUAuX310eduY2h0flMPAs-gzGzoHsz
+    appKey: K6NBP6eU1SDCUwnIt4dX3EBU
     placeholder: Welcome!
     avatar: retro
     vempty_display: false
@@ -67,7 +67,7 @@ comments:
     # 注册账号，获取shortname.disqus.com，shortname为你定义的唯一name
     # 例：我注册配置完毕后的网址为zxcxxxx.disqus.com，zxcxxxx即为shortname
     enable: false
-    shortname: zcheng
+    shortname: CodePlus
 
 # 主题页面导航栏
 navbar:
@@ -116,13 +116,13 @@ friends:
   # site: 地址
   # meta: 描述
   -
-    nickname: Lxwu
-    site: https://lxwu.me/
+    nickname: 码+在线工具
+    site: http://tool.codeplus.vip/
     meta:
-  -
-    nickname: Mhyu
-    site: https://mhyu.top/
-    meta:
+  # -
+  #   nickname: Mhyu
+  #   site: https://mhyu.top/
+  #   meta:
 
 # 页脚信息
 footer:
@@ -135,7 +135,7 @@ footer:
     -
       name: github
       icon: github
-      path: https://github.com/CacoCode/
+      path: https://github.com/CacoCode
     -
       name: rss
       icon: rss
@@ -144,7 +144,7 @@ footer:
   more:
     -
       name: Copyright © CodePlus 2021
-      path: https://github.com/zchengsite/hexo-theme-oranges
+      path: https://github.com/CacoCode
     -
       name: 湘ICP备16012270号
       path: http://www.beian.miit.gov.cn
