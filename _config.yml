@@ -12,7 +12,7 @@ timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://zcheng.site/
+url: http://codeplus.vip/
 root: /
 permalink: :title.html
 permalink_defaults:
@@ -25,7 +25,7 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-skip_render: ['baidu_verify_0ek0txJtPi.html', 'google5273b2adcd968402.html', 'sitemap.xml']
+skip_render: ['sitemap.xml',"CNAME"]
 
 # Writing
 new_post_name: :title.md # File name of new posts
