@@ -137,16 +137,73 @@
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IWebHostEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">    &#123;</span><br><span class="line">        app.UseDeveloperExceptionPage();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    app.UseHttpsRedirection();</span><br><span class="line"></span><br><span class="line">    app.UseRouting();</span><br><span class="line"></span><br><span class="line">    app.UseAuthorization();</span><br><span class="line"></span><br><span class="line">	<span class="comment">//配置OData 路由节点</span></span><br><span class="line">    app.UseEndpoints(endpoints =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">    	endpoints.MapControllers();</span><br><span class="line">        endpoints.EnableDependencyInjection();</span><br><span class="line">        endpoints.Filter().Count().Expand().OrderBy().Select().MaxTop(<span class="literal">null</span>).;</span><br><span class="line"></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><strong>这里需要注意的是，查阅了很多文档资料，都是用的以下配置，先禁用掉了控制器的端点路由配置，然后在Configure中使用MVC路由配置，这样也是可以了，但是OData7.4版本已经支持端点路由配置了，也没有必要那样去做了</strong></p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//不推荐写法</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    services.AddControllers(mvcOptions=&gt;mvcOption.EnableEndpointRouting = <span class="literal">false</span>);</span><br><span class="line">    <span class="comment">//添加OData</span></span><br><span class="line">    services.AddOData();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IWebHostEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">    &#123;</span><br><span class="line">        app.UseDeveloperExceptionPage();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    app.UseHttpsRedirection();</span><br><span class="line"></span><br><span class="line">    app.UseRouting();</span><br><span class="line"></span><br><span class="line">    app.UseAuthorization();</span><br><span class="line"></span><br><span class="line">	app.UseMvc(routeBuilder =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        routeBuilder.EnableDependencyInjection();</span><br><span class="line">        routeBuilder.Filter().Count().Expand().OrderBy().Select().MaxTop(<span class="literal">null</span>).;</span><br><span class="line">    &#125;);   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>filter 语法条件列表</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>备注</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>eq</td>
+<td>等于</td>
+<td>$filter=priority et 1</td>
+</tr>
+<tr>
+<td>ne</td>
+<td>不等于</td>
+<td>$filter=priority ne 1</td>
+</tr>
+<tr>
+<td>gt</td>
+<td>大于</td>
+<td>$filter=priority gt 1</td>
+</tr>
+<tr>
+<td>ge</td>
+<td>大于或等于</td>
+<td>$filter=priority ge 1</td>
+</tr>
+<tr>
+<td>lt</td>
+<td>少于</td>
+<td>$filter=priority lt 1</td>
+</tr>
+<tr>
+<td>le</td>
+<td>小于或等于</td>
+<td>$filter=priority le 1</td>
+</tr>
+<tr>
+<td>and</td>
+<td>并且</td>
+<td>$filter=priority gt 1 and priority lt 10</td>
+</tr>
+<tr>
+<td>or</td>
+<td>或者</td>
+<td>$filter=priority gt 1 or priority lt 10</td>
+</tr>
+<tr>
+<td>not</td>
+<td>不是</td>
+<td>$filter=not endswith(name,’task’)</td>
+</tr>
+</tbody></table>
 <p>现在可以在数据上尝试$select，$orderby，$filter，$count，$skip 和$top的常规操作，结果如图所示：</p>
 <ul>
-<li><strong>默认情况下  /api/test</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508000512650.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ul>
-<li><strong>$ orderby  /api/test?$orderby=age desc</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508000754861.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
-</ul>
+<li><p><strong>默认情况下  /api/test</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508000512650.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<ul>
+<li><p><strong>$orderby  /api/test?$orderby=age desc</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508000754861.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p><strong>$orderby /api/test?$filter=age eq 42</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508000913100.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p><strong>$skip&amp;$top /api/test?$skip=2&amp;$top=2</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508003458278.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>但是在执行 select 的时候数据出现了问题<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508003721577.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
 </li>
 </ul>
-<p><strong>$ orderby  /api/test?$filter=age eq 42</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508000913100.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>filter 语法条件列表<br>|条件  | 备注 | 示例 |<br>|–|–|–|<br>eq |等于    |$filter=priority et 1<br>ne|    不等于    |$filter=priority ne 1<br>gt|    大于|    $filter=priority gt 1<br>ge|    大于或等于|    $filter=priority ge 1<br>lt    |少于    |$filter=priority lt 1<br>le|    小于或等于    |$filter=priority le 1<br>and|    并且    |$filter=priority gt 1 and priority lt 10<br>or|    或者|    $filter=priority gt 1 or priority lt 10<br>not|    不是    |$filter=not endswith(name,’task’)</p>
-<ul>
-<li><strong>$ skip&amp; $ top   /api/test? $skip=2&amp; $top=2</strong><br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508003458278.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>但是在执行 select 的时候数据出现了问题<br><img src="https://qiniu.zcheng.site/image-loading.svg" data-original="https://img-blog.csdnimg.cn/20200508003721577.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</li>
 </ul>
 <p>这是因为采用非<strong>Edm</strong>路线配置OData，则需要安装Microsoft.AspNetCore.Mvc.NewtonsoftJson 软件包来解决Json格式问题 ，然后修改Startup文件ConfigureService 以启用Json格式扩展方法</p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    services.AddControllers().AddNewtonsoftJson();</span><br><span class="line"></span><br><span class="line">    services.AddOData();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
