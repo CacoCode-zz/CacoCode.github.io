@@ -136,29 +136,33 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     });   
 }
 ```
+filter 语法条件列表
+
+
+|条件  | 备注 | 示例 |
+|--|--|--|
+|eq |等于	|$filter=priority et 1
+|ne|	不等于	|$filter=priority ne 1
+|gt|	大于|	$filter=priority gt 1
+|ge|	大于或等于|	$filter=priority ge 1
+|lt	|少于	|$filter=priority lt 1
+|le|	小于或等于	|$filter=priority le 1
+|and|	并且	|$filter=priority gt 1 and priority lt 10
+|or|	或者|	$filter=priority gt 1 or priority lt 10
+|not|	不是	|$filter=not endswith(name,'task')
+
+
 现在可以在数据上尝试$select，$orderby，$filter，$count，$skip 和$top的常规操作，结果如图所示：
 
 - **默认情况下  /api/test**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200508000512650.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70)
- - **$ orderby  /api/test?$orderby=age desc**
+ - **$orderby  /api/test?$orderby=age desc**
  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200508000754861.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70)
 
-**$ orderby  /api/test?$filter=age eq 42**
+ - **$orderby /api/test?$filter=age eq 42**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200508000913100.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70)
-filter 语法条件列表
-|条件  | 备注 | 示例 |
-|--|--|--|
-eq |等于	|$filter=priority et 1
-ne|	不等于	|$filter=priority ne 1
-gt|	大于|	$filter=priority gt 1
-ge|	大于或等于|	$filter=priority ge 1
-lt	|少于	|$filter=priority lt 1
-le|	小于或等于	|$filter=priority le 1
-and|	并且	|$filter=priority gt 1 and priority lt 10
-or|	或者|	$filter=priority gt 1 or priority lt 10
-not|	不是	|$filter=not endswith(name,'task')
 
- - **$ skip& $ top   /api/test? $skip=2& $top=2**
+ - **$skip&$top /api/test?$skip=2&$top=2**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200508003458278.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70)
 但是在执行 select 的时候数据出现了问题
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200508003721577.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R6MTgyMjgwMjc4NQ==,size_16,color_FFFFFF,t_70)
